@@ -1,0 +1,282 @@
+<html> 
+
+  <head>
+	<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+	<script src='//static.opentok.com/v2/js/opentok.min.js'></script>
+	<script src="jquery-1.11.2.min.js"></script>
+	<script src="jquery.cookie.js"></script>
+	<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.4.2.min.js"></script>
+	<script src="debatableGlobal.js"></script>
+	<script src="https://cdn.rawgit.com/carlo/jquery-base64/master/jquery.base64.min.js"></script>
+	<script src="http://crypto-js.googlecode.com/svn/tags/3.0.2/build/rollups/hmac-sha1.js"></script>
+	<script>
+
+		Parse.initialize("cuKxFe0wg2ttC2toJ0avhBb4WnapLfkNs7WIxpIL", "KZhVxQhF26dXfwdH6PWjyevSgDKxeyFGedtiZEtR");
+		
+		var session_id;
+		
+		function getToken(sessionId, userCode, role) {
+		  var secondsInDay = 2592000;
+
+		  // Credentials
+		  var apiKey = '45241592';
+		  var secret = 'b099560439c52ed195d79cb7c15fbae1d9b33f1e';
+	
+		  // Token Params
+		  var timeNow = Math.floor(Date.now()/1000);
+		  var expire = timeNow+secondsInDay;
+		  var data = userCode;
+
+		  TB.setLogLevel(TB.DEBUG);
+
+		  // Calculation
+		  data = escape(data);
+		  var rand = Math.floor(Math.random()*999999);
+		  var dataString =  "session_id="+sessionId+"&create_time="+timeNow+"&expire_time="+expire+"&role="+role+"&connection_data="+data+"&nonce="+rand;
+
+		  // Encryption
+		  var hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA1, secret);
+		  hmac.update( dataString );
+		  hash = hmac.finalize();
+
+		  preCoded = "partner_id="+apiKey+"&sig="+hash+":"+dataString;
+		  token = "T1=="+$.base64.encode( preCoded )
+		  return token;
+		}
+		
+		$( document ).ready(function() {
+			console.log("Loaded");
+
+			$('#loginButton').click(function() {
+				console.log("login try");
+				var UserLogin = Parse.Object.extend("AdminCodes");
+				var query = new Parse.Query(UserLogin);
+				query.equalTo("AdminCode", $('#adminPassword').val());
+				query.find({
+				  success: function(results) {
+				  	if (results.length > 0) {
+				  		console.log("You're logged in!");
+				  		$('#adminPasswordContainer').hide();
+				  		$('#adminContainer').show();			  		
+				  	} else {
+	    				alert("Sorry, that code is invalid.");
+	    				$('#adminPassword').val("");				  	}
+				  },
+				  error: function(error) {
+				    console.log("Error: " + error.code + " " + error.message);
+				  }
+				});			
+			});
+
+			$('#saveButton').click(function() {
+				$('#saveButton').text("Saving...");
+				
+				// REST CALL TO GET SESSION AND TOKENS
+				$.ajax({ 
+				   type: "POST",
+				   url: "https://api.opentok.com/session/create/",
+				   headers: {"X-TB-PARTNER-AUTH":"45241592:b099560439c52ed195d79cb7c15fbae1d9b33f1e"},
+				   success: function(data){
+					   $(data).find('session_id').each(function() {
+						   session_id = $(this).text();
+							var Debate = Parse.Object.extend("Debates");
+						    var debate = new Debate();
+						    console.log(session_id);
+						    debate.set("sessionId", session_id);
+						    debate.set("debateTitle", $('#formDebateTitle').val());
+						    debate.set("proName", $('#formProName').val());
+						    debate.set("oppName", $('#formOppName').val());
+						    debate.set("proAbbreviation", $('#formProAbbreviation').val());
+						    debate.set("oppAbbreviation", $('#formOppAbbreviation').val());
+						    debate.set("proUsername", $('#formProUsername').val());
+						    debate.set("oppUsername", $('#formOppUsername').val());
+						    debate.set("judgeUsername", $('#formJudgeUsername').val());
+						    debate.set("proCode", $('#formProCode').val());
+						    debate.set("oppCode", $('#formOppCode').val());
+						    debate.set("judgeCode", $('#formJudgeCode').val());
+						    debate.set("guestCode", $('#formGuestCode').val());
+						    debate.set("proToken", getToken(session_id,$('#formProCode').val(), 'publisher'));
+						    debate.set("oppToken", getToken(session_id,$('#formOppCode').val(), 'publisher'));
+						    debate.set("judgeToken", getToken(session_id,$('#formJudgeCode').val(), 'moderator'));
+						    debate.set("guestToken", getToken(session_id,$('#formGuestCode').val(), 'publisher'));
+						    debate.set("debateTimeCodes", $('#formDebateTimeCodes').val());
+						    debate.save(null, {
+						      success: function(object) {
+						    	  console.log(object.id);
+								$('#saveButton').text("Saved!");
+								
+								for (i=0; i<4; i++) {
+									if (i == 0) {
+										var DebateCodes = Parse.Object.extend("DebateCodes");
+									    var debateCodes = new DebateCodes();
+									    debateCodes.set("debateId", object.id);
+									    debateCodes.set("code", $('#formProCode').val());
+									    debateCodes.set("roleType", "pro");
+									    debateCodes.save(null, {
+										      success: function(obj) {
+												console.log(obj);
+										      },
+										      error: function(model, error) {
+										        alert("We're sorry, there was an error trying to create the debate codes.  Please try again later.");
+										      }
+									    });								
+									} else if (i == 1) {
+										var DebateCodes = Parse.Object.extend("DebateCodes");
+									    var debateCodes = new DebateCodes();
+									    debateCodes.set("debateId", object.id);
+									    debateCodes.set("code", $('#formOppCode').val());
+									    debateCodes.set("roleType", "opp");
+									    debateCodes.save(null, {
+										      success: function(obj) {
+												console.log(obj);
+										      },
+										      error: function(model, error) {
+										        alert("We're sorry, there was an error trying to create the debate codes.  Please try again later.");
+										      }
+									    });								
+									} else if (i == 2) {
+										var DebateCodes = Parse.Object.extend("DebateCodes");
+									    var debateCodes = new DebateCodes();
+									    debateCodes.set("debateId", object.id);
+									    debateCodes.set("code", $('#formJudgeCode').val());
+									    debateCodes.set("roleType", "judge");
+									    debateCodes.save(null, {
+										      success: function(obj) {
+												console.log(obj);
+										      },
+										      error: function(model, error) {
+										        alert("We're sorry, there was an error trying to create the debate codes.  Please try again later.");
+										      }
+									    });								
+									} else if (i == 3) {
+										var DebateCodes = Parse.Object.extend("DebateCodes");
+									    var debateCodes = new DebateCodes();
+									    debateCodes.set("debateId", object.id);
+									    debateCodes.set("code", $('#formGuestCode').val());
+									    debateCodes.set("roleType", "guest");
+									    debateCodes.save(null, {
+										      success: function(obj) {
+												console.log(obj);
+										      },
+										      error: function(model, error) {
+										        alert("We're sorry, there was an error trying to create the debate codes.  Please try again later.");
+										      }
+									    });								
+									}						
+								}
+						      },
+						      error: function(model, error) {
+						        alert("We're sorry, there was an error trying to create this debate.  Please try again later.");
+						      }
+						    });
+
+					   });
+					   
+					   
+				   },
+				   error: function (xhr, ajaxOptions, thrownError) {
+				        alert(xhr.status);
+				        alert(thrownError);
+				   }
+				});
+				
+			});
+
+		});
+		
+	
+	</script>
+  </head>
+  
+  <body id="debate">
+
+	<div id="debateTitle" class="debateTitleLight">Debatable Admin Console</div>
+
+	<div id="adminPasswordContainer" class="mainContainer">
+		<div class="fullBar">
+			<div class="fullBarTitle">Enter Your Admin Password</div>
+			<div class="fullBarTitle"><input type="text" id="adminPassword" /></div>
+				<div id="loginButton" class="loginButton">Login</div>
+		</div>
+	</div>
+
+	<div id="adminContainer" class="mainContainer" style="display:none">
+		<div class="fullBar">
+			<div class="fullBarTitle">Create New Debate</div>
+			<table width="950">
+				<tr>
+					<td class="formLabel">Debate Title:</td>
+					<td><input type="text" class="formField" id="formDebateTitle" /></td>
+				</tr>
+				
+				<tr>
+					<td class="formLabel">Proposition Label:</td>
+					<td><input type="text" class="formField" id="formProName" placeholder="(i.e. Government, Proposition, For)" /></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel">Opposition Label:</td>
+					<td><input type="text" class="formField" id="formOppName" placeholder="(i.e. Opposition, Against)" /></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel">Proposition Timer Label:</td>
+					<td><input type="text" class="formField" id="formProAbbreviation" placeholder="(i.e. Gov, Prop, For)" /></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel">Opposition Timer Label:</td>
+					<td><input type="text" class="formField" id="formOppAbbreviation" placeholder="(i.e. Opp, Neg, Agst)" /></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel">Proposition Speaker Name:</td>
+					<td><input type="text" class="formField" id="formProUsername" placeholder="(first and last)" /></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel">Opposition Speaker Name:</td>
+					<td><input type="text" class="formField" id="formOppUsername" placeholder="(first and last)" /></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel">Judge Speaker Name:</td>
+					<td><input type="text" class="formField" id="formJudgeUsername" placeholder="(first and last)" /></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel">Proposition Code:</td>
+					<td><input type="text" class="formField" id="formProCode" placeholder="(must be unique across all debates)" /></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel">Opposition Code:</td>
+					<td><input type="text" class="formField" id="formOppCode" placeholder="(must be unique across all debates)" /></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel">Judge Code:</td>
+					<td><input type="text" class="formField" id="formJudgeCode" placeholder="(must be unique across all debates)" /></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel">Guest Code:</td>
+					<td><input type="text" class="formField" id="formGuestCode" placeholder="(must be unique across all debates)" /></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel">Timer Format:</td>
+					<td><input type="text" class="formField" id="formDebateTimeCodes" value="p300,o300,p300,o300,o300,p300" /></td>
+				</tr>
+
+			</table>
+
+			<div id="saveButton" class="loginButton">Save</div>
+
+		</div>
+	</div>
+
+  </body> 
+
+</html>

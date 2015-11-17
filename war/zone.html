@@ -1,0 +1,234 @@
+<html> 
+
+  <head>
+	<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+	<script src='//static.opentok.com/v2/js/opentok.min.js'></script>
+	<script src="jquery-1.11.2.min.js"></script>
+	<script src="jquery.cookie.js"></script>
+	<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.4.2.min.js"></script>
+	<script>
+		function createNameTag(name, size, $appendToElement) {
+			var nameTagDiv = $('<div>', {
+				class: 'nameTag ' + size
+			});
+			nameTagDiv.text(name);
+			nameTagDiv.hide();
+			var destination = $appendToElement.offset();
+			console.log(destination);
+			nameTagDiv.appendTo($appendToElement);
+			nameTagDiv.css({position: 'absolute', top: destination.top + $appendToElement.outerHeight() - nameTagDiv.outerHeight(), left: destination.left});
+			nameTagDiv.show();
+		}
+
+		function getQueryVariable(variable)
+		{
+		       var query = window.location.search.substring(1);
+		       var vars = query.split("&");
+		       for (var i=0;i<vars.length;i++) {
+		               var pair = vars[i].split("=");
+		               if(pair[0] == variable){return pair[1];}
+		       }
+		       return(false);
+		}
+
+		var uid = getQueryVariable('uid');
+
+	$( document ).ready(function() {
+		
+		$('#goToDebate').click(function() {
+			window.location.href = "showcase.html?uid=808";
+		});
+
+		$('#logoffButton').click(function() {
+			window.location.href = "index.html";
+		});
+
+	});
+	
+	</script>
+  </head>
+  
+  <body id="zone">
+
+	<div id="menuBar" class="menuBar">
+		<div id="logoffButton">Logoff</div>
+	</div>
+
+	<div id="debateTitle" class="debateTitle">Vegas thinks the Washington Huskies will only win 4 games in 2015</div>
+
+	<div class="mainContainer" id="mainContainer">
+
+		<div class="zoneContainer" id="zoneContainer">
+		
+			<div class="containerRow">
+				<div class="leftBar">
+					<div class="sideBar">
+						<div class="sideBarTitle">Related Topics</div>
+						<div class="sideBarItem"><img src="link_arrow.png" height="10" /> Petersen's recruiting tactics hurting their chances of recruiting much wanted players.</div>
+						<div class="sideBarItem"><img src="link_arrow.png" height="10" /> Ohio State will NOT win the BIG 10 Championship.</div>
+						<div class="sideBarItem"><img src="link_arrow.png" height="10" /> SEC is the best conference in college football.</div>
+						<div class="sideBarItem"><img src="link_arrow.png" height="10" /> The Bowls need to be removed from playoff.</div>
+					</div>
+				</div>
+		
+				<div class="rightBar">
+					<div class="sideBar">
+						<div class="sideBarTitle">Top 5 Topics</div>
+						<div class="sideBarItem"><img src="link_arrow.png" height="10" /> Oregon Ducks are a dynasty.</div>
+						<div class="sideBarItem"><img src="link_arrow.png" height="10" /> Players should be paid in addition to their scholarships.</div>
+						<div class="sideBarItem"><img src="link_arrow.png" height="10" /> The SEC was right to pass the ban on transfer players that have a history of  "serious" misconduct issues.</div>
+					</div>
+				</div>		
+	
+				<div class="sparkVideoContainer">
+					<iframe width="560" height="315" src="https://www.youtube.com/embed/n5pE6wtEf3Y" frameborder="0" allowfullscreen></iframe>		
+				</div>
+			</div>
+	
+			<div class="fullBar">
+				<div class="fullBarTitle">Debates happening now</div>
+			
+				<div class="fullBarSectionLeft">
+					<div class="fullBarSectionTitle">For</div>
+					<div class="comment">
+						<div class="comment_pic"><img src="Comments_4_Pic.jpg" width="50" /></div>
+						<div class="comment_username">Chris Fetters</div>
+						<div class="comment_text">VEGAS says the Huskies won't win more than 4 games.</div>
+					</div>
+				</div>
+	
+				<div class="fullBarSectionRight">
+					<div class="fullBarSectionTitle">Against</div>				
+					<div class="comment">
+						<div class="comment_pic"><img src="Comments_5_Pic.jpg" width="50" /></div>
+						<div class="comment_username">Zach Tang</div>
+						<div class="comment_text">I know the Washington Huskies are a young team this year, but I do think they will win more than 4 games.</div>
+					</div>
+				</div>
+
+				<div id="goToDebate" class="fullBarCenterAction">
+					<img src="link_arrow_green.png" height="10" border="0" class="makeLink" /> <span class="makeLink">Watch this debate live!</span>
+				</div>
+			</div>		
+	
+			<div class="fullBar">
+				<div class="fullBarTitle">People Waiting to Debate This Topic</div>
+			
+				<div class="fullBarSectionLeft">
+					<div class="fullBarSectionTitle">3 People For</div>
+					<div class="comment">
+						<div class="comment_pic"><img src="Comments_E_Pic.jpg" width="50" /></div>
+						<div class="comment_username">John Erickson</div>
+						<div class="comment_text">"This will not be a good year for the Huskies."</div>
+						<div class="challenge"><img src="link_arrow_green.png" height="10" /> Challenge to a debate</div>
+					</div>
+	
+					<div class="comment">
+						<div class="comment_pic"><img src="Comments_B_Pic.jpg" width="50" /></div>
+						<div class="comment_username">Ali Smith</div>
+						<div class="comment_text">"Young team, they will be building foundations this year."</div>
+						<div class="challenge"><img src="link_arrow_green.png" height="10" /> Challenge to a debate</div>
+					</div>
+	
+					<div class="comment">
+						<div class="comment_pic"><img src="Comments_C_Pic.jpeg" width="50" /></div>
+						<div class="comment_username">Ken Johnson</div>
+						<div class="comment_text">"IF they win 4 games that will be a surprise."</div>
+						<div class="challenge"><img src="link_arrow_green.png" height="10" /> Challenge to a debate</div>
+					</div>
+				</div>
+	
+				<div class="fullBarSectionRight">
+					<div class="fullBarSectionTitle">2 People Against</div>
+						
+					<div class="comment">
+						<div class="comment_pic"><img src="Comments_D_Pic.jpg" width="50" /></div>
+						<div class="comment_username">Tammy Ray</div>
+						<div class="comment_text">"Only 4 games?  Are you kidding?"</div>
+						<div class="challenge"><img src="link_arrow_green.png" height="10" /> Challenge to a debate</div>
+					</div>
+
+					<div class="comment">
+						<div class="comment_pic"><img src="Comments_A_Pic.jpeg" width="50" /></div>
+						<div class="comment_username">Eddy Jones</div>
+						<div class="comment_text">"The coach will bring this team up fast.  They will win more than 4 games this year."</div>
+						<div class="challenge"><img src="link_arrow_green.png" height="10" /> Challenge to a debate</div>
+					</div>
+
+				</div>		
+			</div>		
+
+		</div>
+	
+	</div>
+
+  </body> 
+
+</html>
+
+<!--
+		<div class="containerRow">
+			<div class="halfBarLeft">
+				<div class="halfBarTitle">People Waiting to Debate This Topic</div>
+				<div class="halfBarHalfSectionLeft">3 People For
+					<div class="comment">
+						<div class="comment_pic"><img src="Comments_1_Pic.jpg" width="50" /></div>
+						<div class="comment_username">First Last</div>
+						<div class="comment_text">"My feelings about this..."</div>
+					</div>
+
+					<div class="comment">
+						<div class="comment_pic"><img src="Comments_1_Pic.jpg" width="50" /></div>
+						<div class="comment_username">First Last</div>
+						<div class="comment_text">"My feelings about this..."</div>
+					</div>
+
+					<div class="comment">
+						<div class="comment_pic"><img src="Comments_1_Pic.jpg" width="50" /></div>
+						<div class="comment_username">First Last</div>
+						<div class="comment_text">"My feelings about this..."</div>
+					</div>
+
+				</div>
+
+				<div class="halfBarHalfSectionRight">2 People Against
+					<div class="comment">
+						<div class="comment_pic"><img src="Comments_1_Pic.jpg" width="50" /></div>
+						<div class="comment_username">First Last</div>
+						<div class="comment_text">"My feelings about this..."</div>
+					</div>
+
+					<div class="comment">
+						<div class="comment_pic"><img src="Comments_1_Pic.jpg" width="50" /></div>
+						<div class="comment_username">First Last</div>
+						<div class="comment_text">"My feelings about this..."</div>
+					</div>
+				</div>
+			</div>
+	
+			<div class="halfBarRight">
+				<div class="halfBarTitle">Comments Placeholder</div>
+
+				<div class="comment">
+					<div class="comment_pic"><img src="Comments_1_Pic.jpg" width="50" /></div>
+					<div class="comment_username">Linda Wilson</div>
+					<div class="comment_text">This is the most thing to talk about ever.  What?  Me too.</div>
+				</div>
+
+				<div class="comment">
+					<div class="comment_pic"><img src="Comments_2_Pic.png" width="50" /></div>
+					<div class="comment_username">Linda Wilson</div>
+					<div class="comment_text">This is the most thing to talk about ever.  What?  Me too.</div>
+				</div>
+				
+				<div class="comment">
+					<div class="comment_pic"><img src="Comments_3_Pic.jpeg" width="50" /></div>
+					<div class="comment_username">Linda Wilson</div>
+					<div class="comment_text">This is the most thing to talk about ever.  What?  Me too.</div>
+				</div>
+				
+				</div>
+			</div>
+		</div>
+ -->

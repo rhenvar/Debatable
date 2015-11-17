@@ -1,0 +1,59 @@
+<html> 
+
+  <head>
+	<script src='//static.opentok.com/v2/js/opentok.min.js'></script>
+	<style>
+		.streamWindow {
+			border: solid 1px green;
+			margin: 20px;
+		}
+	</style>
+  </head>
+  
+  <body>
+  	<script type="text/javascript">
+	  var apiKey    = "45219192";
+	  var sessionId = "2_MX40NTIxOTE5Mn5-MTQyOTk0NzQwNzEwNH5rcUI1emJYTlhTL1pQOStvODA2eUxpMXN-fg";
+	  var token     = "T1==cGFydG5lcl9pZD00NTIxOTE5MiZzaWc9MmUwNzNhY2IzNGI1ZjcxZTJmNDU1NmFhYjk2ZDgwODEyMTM2OWI0Mzpyb2xlPW1vZGVyYXRvciZzZXNzaW9uX2lkPTJfTVg0ME5USXhPVEU1TW41LU1UUXlPVGswTnpRd056RXdOSDVyY1VJMWVtSllUbGhUTDFwUU9TdHZPREEyZVV4cE1YTi1mZyZjcmVhdGVfdGltZT0xNDI5OTQ3NDMzJm5vbmNlPTAuMTgyNDA5NjEyNDc4Nzc4MTgmZXhwaXJlX3RpbWU9MTQzMDU1MjEwNSZjb25uZWN0aW9uX2RhdGE9";
+	 
+	  var session = OT.initSession(apiKey, sessionId);
+	 /*
+	  session.on("streamCreated", function(event) {
+	    session.subscribe(event.stream);
+	  });
+	 */
+	 session.on('streamCreated', function(event) {
+		  var subscriberProperties = {insertMode: 'append'};
+		  var subscriber = session.subscribe(event.stream,
+		    'theirWindow',
+		    subscriberProperties,
+		    function (error) {
+		      if (error) {
+		        console.log(error);
+		      } else {
+		        console.log('Subscriber added.');
+		      }
+		  });
+	});
+
+	  session.connect(token, function(error) {
+	    var publisher = OT.initPublisher('myWindow');
+	    session.publish(publisher);
+	  });
+	</script>
+
+	<div class="streamWindow" id="myWindow"></div>
+	<div class="streamWindow" id="theirWindow"></div>
+  </body> 
+
+</html>
+
+<!-- FROM OLD REG PAGE
+
+			<div class="headerRightOptions">
+				Already have an account?
+				<input id="emailLogin" class="headerLogin headerLoginEmail" type="text" placeholder="email" />
+				<input id="passwordLogin" class="headerLogin headerLoginPassword" type="password" placeholder="password" />
+				<div id="headerLoginButton" class="headerLoginButton">Login</div>
+			</div>
+ -->

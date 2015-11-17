@@ -1,0 +1,222 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+		<link rel="stylesheet" type="text/css" href="css/main.css" media="screen" />
+		<script src="jquery-1.11.2.min.js"></script>
+		<script src="jquery.cookie.js"></script>
+		<script src="js/sha1.js"></script>
+		<script src="js/deUtil.js"></script>
+		<script src="js/deClassUser.js"></script>
+		<script>
+			$( document ).ready(function() {
+				$('#emailLogin').keyup(function (e) {
+				    if (e.keyCode == 13) {
+				    	$('#headerLoginButton').trigger("click");
+				    }
+				});
+
+				$('#passwordLogin').keyup(function (e) {
+				    if (e.keyCode == 13) {
+				    	$('#headerLoginButton').trigger("click");
+				    }
+				});
+
+				$('#headerLoginButton').click(function() {
+					$('#headerLoginButton').text("Wait...");
+    				if ($('#emailLogin').val() == "") {
+    					alert("Please enter a valid email address");
+    				} else if ($('#passwordLogin').val() == "") {
+    					alert("Please enter your password");
+    				} else {
+        				console.log("Login attempt...");
+        				authByEmailPassword($('#emailLogin').val().toLowerCase(), hex_sha1($('#passwordLogin').val() + "shalako"), function(response) {
+        					console.log(response);
+        					if (response.id == "Error") {
+
+        						alert("Invalid email and password.  Please try again or click the forgot your password link.");
+    							$('#emailLogin').val("");
+    							$('#passwordLogin').val("");
+        						
+        					} else {
+            					$.cookie("deToken", response.token);
+            					$.cookie("deUserID", response.id);
+            					$.cookie("deFirstName", response.firstName);
+               					$.cookie("deLastName", response.lastName);
+               					$.cookie("deEmail", response.email);
+               				 
+               					window.location = "/home.html";    					        						
+        					}
+        				});
+    				}
+    			});
+
+				$('#forgotPassword').click(function() {
+					var $passwordModal = $("<div>", { class: "modalBoxSmall" });
+
+					var $passwordRow = $("<div>", { class: "contactsRow" });
+					
+					var $passwordLabel = $("<div>", { class: "contactsBoxLabel" });
+					$passwordLabel.html("Email:");
+					$passwordLabel.appendTo($passwordRow);
+
+					var $passwordInput = $("<input>", { class: "contactsBoxInput" });
+					$passwordInput.appendTo($passwordRow);
+					
+					$passwordRow.appendTo($passwordModal);
+
+					var $resetButtonRow = $("<div>", { class: "contactsRow" });
+
+					var $resetButton = $("<div>", { class: "addMeButton" });
+					$resetButton.text("Reset My Password");
+					$resetButton.appendTo($resetButtonRow);
+					$resetButton.click(function() {
+						resetPassword($passwordInput.val().toLowerCase());
+						$('#mainContainer').empty();
+						$('#mainContainer').html("<div class='titleCenter'>Please check your email for a link to reset your password.</div>");        						    		
+						$.removeCookie("deToken");
+						$.removeCookie("deUserID");
+						$.removeCookie("deFirstName");
+						$.removeCookie("deLastName");
+						$.removeCookie("deEmail");
+						$passwordModal.hide();
+					})
+
+					$resetButtonRow.appendTo($passwordModal);
+
+					
+					$passwordModal.appendTo(document.body);
+
+				})
+				
+    			$('#signupButton').click(function() {
+    				if ($('#password').val() == $('#repeatPassword').val()) {
+        				$('#signupButton').text("Please wait...");
+    					var user = {};
+    					user.id = createUUID();
+    					user.email = $('#email').val().toLowerCase();
+    					user.passwordHashed = hex_sha1($('#password').val() + "shalako");
+    					user.firstName = $('#firstName').val();
+    					user.lastName = $('#lastName').val();
+    					// MOVE TO COMPLETE PROFILE user.school = $('#school').val();
+    					// MOVE TO COMPLETE PROFILE user.debateFormats = $( "#debateFormats option:selected" ).text();
+    					user.createdDate = new Date().getTime();
+    					createUser(user, function(response) {
+    						if (response.id == "Error" && response.email =="200") {
+    							alert("We're sorry, this email address has already been registered.  Please click the forgot your password link or contact support@debatable.co for assistance.");
+    						} else if (response.id != "Error") {
+            					$.cookie("deToken", response.token);
+            					$.cookie("deUserID", response.id);
+            					$.cookie("deFirstName", response.firstName);
+            					$.cookie("deLastName", response.lastName);
+            					$.cookie("deEmail", response.email);
+    							window.location = "/payment.html?email=" + encodeURIComponent(response.email);
+    						}
+    					});
+    					
+    				} else {
+    					alert("Your passwords do not match, please try again.");
+    					$('#password').val("");
+    					$('#repeatPassword').val("");
+    				}
+    			});
+    			
+			});
+		</script>
+	</head>
+
+	<body id="background">
+		<div class="headerContainer">
+			<a href="index.html"><img src="images/debatable_logo_white.png" height="45" border="0"/></a>
+		</div>
+		
+		<div id="mainContainer" class="mainContainer">
+		
+		<div class="splashTitle">Welcome to Debatable!</div>
+
+		<!-- div class="splashVideo">
+			<video width="427" height="240" controls>
+		  		<source src="images/DebatableIntro.mp4" type="video/mp4">
+				Your browser does not support the video tag.
+			</video>
+		</div>
+		-->
+
+			<div class="mainContainerLeftCol">
+				<div class="titleCenter">Join the Debatable Community</div>
+	
+				<div class="regFormRow">
+					<div class="regFormLabel">First Name :</div>
+					<div class="regFormField"><input id="firstName" class="regForm" type="text" placeholder="first name" /></div>
+				</div>
+	
+				<div class="regFormRow">
+					<div class="regFormLabel">Last Name :</div>
+					<div class="regFormField"><input id="lastName" class="regForm" type="text" placeholder="last name" /></div>
+				</div>
+	
+				<div class="regFormRow">
+					<div class="regFormLabel">Email :</div>
+					<div class="regFormField"><input id="email" class="regForm" type="text" placeholder="email" /></div>
+				</div>
+	
+				<div class="regFormRow">
+					<div class="regFormLabel">Password :</div>
+					<div class="regFormField"><input id="password" class="regForm" type="password" placeholder="password" /></div>
+				</div>
+	
+				<div class="regFormRow">
+					<div class="regFormLabel">Repeat :</div>
+					<div class="regFormField"><input id="repeatPassword" class="regForm" type="password" placeholder="password" /></div>
+				</div>			
+
+				<div id="signupButton" class="regButton">Signup</div>
+			</div>
+
+			<div class="mainContainerRightCol">
+				<div class="titleCenter">Already have an account?</div>
+		
+				<div class="regFormRow">
+					<div class="regFormLabel">Email :</div>
+					<div class="regFormField"><input id="emailLogin" class="regForm" type="text" placeholder="email" /></div>
+				</div>
+	
+				<div class="regFormRow">
+					<div class="regFormLabel">Password :</div>
+					<div class="regFormField"><input id="passwordLogin" class="regForm" type="password" placeholder="password" /></div>
+				</div>
+
+				<div class="regFormRow" id="forgotPassword">Forgot your password?</div>
+	
+				<div id="headerLoginButton" class="regButton">Login</div>
+			</div>
+
+
+		<!--  div class="missionStatement">We want to give debaters the perfect tool to participate in debate with anyone, anywhere, and at anytime because we believe education to be a driving force of a better future; debate, as we all know, is a driving force of academic success.</div> -->
+
+			<!--  MOVE TO COMPLETE PROFILE PAGE 
+			<div class="regFormRow">
+				<div class="regFormLabel">School / Organization :</div>
+				<div class="regFormField"><input id="school" class="regForm" type="text" placeholder="school / organization" /></div>
+			</div>
+
+			<div class="regFormRow">
+				<div class="regFormLabel">Debate Format :</div>
+				<div class="regFormField">
+					<select id="debateFormats" class="regForm">
+						<option value="0">Please select your preferred debate format</option>
+						<option value="1">Team Policy Debate</option>
+						<option value="2">Lincoln-Douglas Debate</option>
+						<option value="3">NDT Debate</option>
+						<option value="4">CEDA Debate</option>
+						<option value="5">Parliamentary Debate</option>
+						<option value="6">Middle School Debate</option>
+						<option value="7">No Preference / Not Sure</option>
+					</select>
+				</div>
+			</div>
+			-->
+
+
+		</div>
+	</body>
+</html>

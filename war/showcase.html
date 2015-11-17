@@ -1,0 +1,313 @@
+<html> 
+
+  <head>
+	<link rel="stylesheet" type="text/css" href="showcase.css" media="screen" />
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+	<script src='//static.opentok.com/v2/js/opentok.min.js'></script>
+	<script src="jquery-1.11.2.min.js"></script>
+	<script src="jquery.cookie.js"></script>
+	<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.4.2.min.js"></script>
+	<script src="debatableGlobal.js"></script>
+	<script>
+
+	var timerInterval;
+	var proUsername;
+	var oppUsername;
+	var proCode;
+	var oppCode;
+
+	$( document ).ready(function() {
+
+		jQuery.fn.center = function () {
+		    this.css("position","absolute");
+		    this.css("top", "86px");
+		    this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) + 
+		                                                $(window).scrollLeft()) + "px");
+		    return this;
+		}
+
+	  	var $splash = $('<div>', {
+	  		class: 'splashContainer'
+	  	});
+	  	$splash.html('<iframe width="650" height="375" src="https://www.youtube.com/embed/2rlkG3ZZyDg?autoplay=1" frameborder="0" allowfullscreen></iframe>');
+		// ?autoplay=1
+	  	$splash.appendTo('#showcase');
+	  	$splash.center();
+	  	
+	  	setTimeout(function(){ 
+	  		$splash.fadeOut('slow', function() {
+	  			// Create debate countdown
+	  		  	var $splash = $('<div>', {
+	  		  		class: 'splashContainer'
+	  		  	});
+	  			
+	  		  	$splash.html('<div>THIS DEBATE WILL BEGIN IN</div><div id="countdown">5</div>');
+	  		  	$splash.appendTo('#showcase');
+	  		  	$splash.center();
+	  		  	
+	  		  	var i = 4;
+
+	  		  	var tI = setInterval(function () {
+
+	  		    	$('#countdown').text(i);
+
+	  		        if (i < 1) {
+	  		        	clearInterval(tI);
+	  		        	$splash.fadeOut(function() {
+	  		        		console.log("splash out speakers in");
+		  		        	$('#propContainer').hide();
+		  		        	$('#oppContainer').hide();
+		  		        	$('#propContainer').css("visibility", "visible");
+		  		        	$('#oppContainer').css("visibility", "visible");
+		  		        	$('#propContainer').fadeIn();
+		  		        	$('#oppContainer').fadeIn();
+		  		        	
+		  		        	var startDelay = 0;
+		  		  		  	var tI2 = setInterval(function () {
+		  		  		  		startDelay++;
+		  		  		  		if (startDelay > 5 && startDelay < 45)
+		  		  		  		var randVal = Math.floor(Math.random() * 10);
+
+		  		  		  		var currentProp = parseInt($('#propPoints').text());
+		  		  		  		var currentOpp = parseInt($('#oppPoints').text());
+
+		  		  		  		console.log(randVal);
+		  		  		  		
+		  		  		  		if (randVal < 3) {
+		  		  		  			currentProp++;
+			  		  		  		if (currentProp < 10) {
+			  		  		  			currentProp = "0" + currentProp;
+			  		  		  		}
+			  		  		        $('#propPoints').text(currentProp);
+		  		  		  			
+		  		  		  		} else if (randVal > 5) {
+		  		  		  			currentProp++;
+			  		  		  		if (currentProp < 10) {
+			  		  		  			currentProp = "0" + currentProp;
+			  		  		  		}
+			  		  		        $('#propPoints').text(currentProp);
+		  		  		  			currentOpp++;
+			  		  		  		if (currentOpp < 10) {
+			  		  		  			currentOpp = "0" + currentOpp;
+			  		  		  		}
+			  		  		        $('#oppPoints').text(currentOpp);
+		  		  		  			
+		  		  		  		}
+		  		  		  		
+
+		  		  		  	}, 5000);
+
+	  		        	});
+	  		        } else {
+		  		        i--;	  		        	
+	  		        }
+	  		        
+	  		    }, 1000);
+
+	  		}); 
+	  	}, 35000);
+	  	
+		$('#scoreLeft').click(function() {
+			clickScore("left");    					
+		});
+
+		$('#scoreRight').click(function() {
+			clickScore("right");    					
+		});
+
+		var uid = getQueryVariable('uid');
+		
+				// Add Sessions Here
+		var apiKey    = "45241592";
+		var sessionId = "1_MX40NTI0MTU5Mn5-MTQzMzgyMzQ5MjU2Nn4wS3R4RHNOVGd4ZGF2cVdEWndMU2hKdDJ-fg";
+		var token     = "";
+		var publishTo = "";
+		var subscriberProperties = "";
+
+	if (uid == "808") {
+		// GUEST
+	  	token ="T1==cGFydG5lcl9pZD00NTI0MTU5MiZzaWc9MzlkODIyY2EyNDA3MDRjMjk0MjJmNzgyMzI4OTE4ZWU5ZDZhOWY4Nzpyb2xlPW1vZGVyYXRvciZzZXNzaW9uX2lkPTFfTVg0ME5USTBNVFU1TW41LU1UUXpNemd5TXpRNU1qVTJObjR3UzNSNFJITk9WR2Q0WkdGMmNWZEVXbmRNVTJoS2RESi1mZyZjcmVhdGVfdGltZT0xNDMzODIzNTE0Jm5vbmNlPTAuNTE1NzY1ODAzNjYxNTg4JmV4cGlyZV90aW1lPTE0MzY0MTU0NjkmY29ubmVjdGlvbl9kYXRhPTgwOA==";
+	  	publishTo = "guestVideo";
+	 	subscriberProperties = {insertMode: 'append', width: 160, height: 120};
+
+	} else if (uid == "818") {
+		// PROP
+		token = "T1==cGFydG5lcl9pZD00NTI0MTU5MiZzaWc9MWM2Mzg5NGUyZmVlOGExNzIwOTY0MzM3YmRjY2VmYjI2ODUxMGNhYjpyb2xlPW1vZGVyYXRvciZzZXNzaW9uX2lkPTFfTVg0ME5USTBNVFU1TW41LU1UUXpNemd5TXpRNU1qVTJObjR3UzNSNFJITk9WR2Q0WkdGMmNWZEVXbmRNVTJoS2RESi1mZyZjcmVhdGVfdGltZT0xNDMzODIzNTMyJm5vbmNlPTAuODcxMDQ1NzM3NTk2MzEwNCZleHBpcmVfdGltZT0xNDM2NDE1NDY5JmNvbm5lY3Rpb25fZGF0YT04MTg=";
+	  	publishTo = "propVideo";
+	 	subscriberProperties = {insertMode: 'append', width: 400, height: 300};
+
+	} else if (uid == "828") {
+		// OPP
+		token = "T1==cGFydG5lcl9pZD00NTI0MTU5MiZzaWc9N2Q0ZTU3MzQwNzA3OWExYmY5MTA5YjRhNmIyZGI3OWNjYzNjYzA3ODpyb2xlPW1vZGVyYXRvciZzZXNzaW9uX2lkPTFfTVg0ME5USTBNVFU1TW41LU1UUXpNemd5TXpRNU1qVTJObjR3UzNSNFJITk9WR2Q0WkdGMmNWZEVXbmRNVTJoS2RESi1mZyZjcmVhdGVfdGltZT0xNDMzODIzNTYyJm5vbmNlPTAuNTg3NzM2MTEzMTQwNjM3NiZleHBpcmVfdGltZT0xNDM2NDE1NDY5JmNvbm5lY3Rpb25fZGF0YT04Mjg=";
+	  	publishTo = "oppVideo";
+	 	subscriberProperties = {insertMode: 'append', width: 400, height: 300};
+
+	}
+	
+	var session = OT.initSession(apiKey, sessionId);
+	 	 
+	 session.on('streamCreated', function(event) {
+
+		 console.log("Event stream found...");
+		 console.log(event.stream.connection.data);
+
+		  var streamWindowId;
+		  var speakerName;
+		  var sessionNameTagSize;
+
+		  if (event.stream.connection.data == "818") {
+			streamWindowId = 'propVideo';
+		 	subscriberProperties = {insertMode: 'append', width: 400, height: 300};
+		  } else if (event.stream.connection.data == "828") {
+		  	streamWindowId = 'oppVideo';
+		 	subscriberProperties = {insertMode: 'append', width: 400, height: 300};
+		  } else if (event.stream.connection.data == "808") {
+			  	streamWindowId = 'guestVideo';
+			 	subscriberProperties = {insertMode: 'append', width: 160, height: 120};
+			  }
+
+		  var subscriber = session.subscribe(event.stream,
+		    streamWindowId,
+		    subscriberProperties,
+		    function (error) {
+		      if (error) {
+		        console.log(error);
+		      } else {
+		        console.log('Subscriber added.');
+		      }
+		  });
+
+	});
+
+		  session.connect(token, function(error) {
+			    var publisher = OT.initPublisher(publishTo, subscriberProperties);
+			    session.publish(publisher);
+			  });		 
+	  
+		session.on("signal", function(event) {
+			console.log("Signal sent from connection " + event.from.id);
+			startTimerShowcase();			  
+		});
+
+		$('#logoffButton').click(function() {
+			session.signal(
+					  {
+					    data:"startTimer"
+					  },
+					  function(error) {
+					    if (error) {
+					      console.log("signal error ("
+					                   + error.code
+					                   + "): " + error.message);
+					    } else {
+					      console.log("signal sent.");
+					    }
+					  }
+					);
+			});
+	});
+	
+	</script>
+  </head>
+  
+  <body id="showcase">
+
+	<div id="menuBar" class="menuBar">
+		<div id="logoffButton">Start Timer</div>
+		<div class="logoImg"><img src="logo.png" width="160" /></div>
+		<div id="debateTitle" class="debateTitle">Vegas thinks the Washington Huskies will only win 4 games in 2015</div>
+	</div>
+
+	<div id="judgeTimerContainer"></div>
+
+	<div class="mainContainer">
+
+		<div class="debateContainer">
+
+			<div class="debateHeader"></div>
+
+			<div class="debateBody">
+
+				<div class="propContainer" id="propContainer" style="visibility: hidden;">
+					<div class="speakerVideo" id="propVideo"></div>
+					<div class="timerOverlay" id="propTimer"></div>
+					<div class="infoOverlay" id="propInfo">
+						<div class="infoScore">
+							Score
+							<div class="infoScorePoints" id="propPoints">00</div>
+						</div>
+						<div class="infoName">Chris Fetters</div>
+						<div>
+							<img src="badge-football-gold.png" width="24" class="badge" />
+						</div>
+					</div>
+				</div>
+				
+				<div class="oppContainer" id="oppContainer" style="visibility: hidden;">
+					<div class="speakerVideo" id="oppVideo"></div>
+					<div class="timerOverlay" id="oppTimer"></div>
+					<div class="infoOverlay" id="oppInfo">
+						<div class="infoScore">
+							Score
+							<div class="infoScorePoints" id="oppPoints">00</div>
+						</div>
+						<div class="infoName">Zach Tang</div>
+						<div>
+							<img src="badge-football-silver.png" width="24" class="badge" />
+						</div>					
+					</div>
+				</div>
+
+			</div>
+
+			<div class="fullBar">
+			
+			<div id="guestVideo" style="float:right;"></div>
+			
+				<div class="fullBarTitle">Comments</div>
+
+				<div class="comment">
+					<div class="comment_pic"><img src="Comments_3_Pic.jpeg" width="50" /></div>
+					<div class="comment_username">Anthony Edwards</div>
+					<div class="comment_text">Wow!  I wasn't thirsty but that Bud Light ad is speaking to me!</div>
+				</div>
+
+				<div class="comment">
+					<div class="comment_pic"><img src="Comments_1_Pic.jpg" width="50" /></div>
+					<div class="comment_username">Linda Wilson</div>
+					<div class="comment_text">I love to share my opinions on everything.</div>
+				</div>
+
+				<div class="comment">
+					<div class="comment_pic"><img src="Comments_2_Pic.png" width="50" /></div>
+					<div class="comment_username">Rebecca Smith</div>
+					<div class="comment_text">This is a great debate tool.  I want to debate.</div>
+				</div>
+				
+				
+				</div>
+			
+<!--
+			<div class="guestScoring">
+				<div class="guestScoringButton" id="scoreLeft"><img src="leftArrow.png" width="50" /></div>
+				<div class="guestScoringButton"><div class="guestScoringCircle" id="circle1"></div></div>
+				<div class="guestScoringButton"><div class="guestScoringCircle" id="circle2"></div></div>
+				<div class="guestScoringButton"><div class="guestScoringCircle" id="circle3"></div></div>
+				<div class="guestScoringButton"><div class="guestScoringCircle" id="circle4"></div></div>
+				<div class="guestScoringButton"><div class="guestScoringCircle" id="circle5"></div></div>
+				<div class="guestScoringButton"><div class="guestScoringCircle" id="circle6"></div></div>
+				<div class="guestScoringButton"><div class="guestScoringCircle" id="circle7"></div></div>
+				<div class="guestScoringButton"><div class="guestScoringCircle" id="circle8"></div></div>
+				<div class="guestScoringButton"><div class="guestScoringCircle" id="circle9"></div></div>
+				<div class="guestScoringButton"><div class="guestScoringCircle" id="circle10"></div></div>
+				<div class="guestScoringButton"><div class="guestScoringCircle" id="circle11"></div></div>
+				<div class="guestScoringButton" id="scoreRight"><img src="rightArrow.png" width="50" /></div>				
+			</div>
+ -->
+		</div>
+
+	</div>
+
+  </body> 
+
+</html>

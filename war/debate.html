@@ -1,0 +1,309 @@
+<html> 
+
+  <head>
+	<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+	<script src='//static.opentok.com/v2/js/opentok.min.js'></script>
+	<script src="jquery-1.11.2.min.js"></script>
+	<script src="jquery.cookie.js"></script>
+	<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.4.2.min.js"></script>
+	<script src="debatableGlobal.js"></script>
+	<script>
+
+	var streamCount = 0;
+	var judgeCount = 0;
+	var timerInterval;
+	var proUsername;
+	var oppUsername;
+	var judgeUsername;
+	var proCode;
+	var oppCode;
+	var judgeCode;
+	var guestCode;
+
+	$( document ).ready(function() {
+		Parse.initialize("cuKxFe0wg2ttC2toJ0avhBb4WnapLfkNs7WIxpIL", "KZhVxQhF26dXfwdH6PWjyevSgDKxeyFGedtiZEtR");
+
+		var uid = getQueryVariable('uid');
+		
+		console.log(getQueryVariable('did'));
+
+		var Debate = Parse.Object.extend("Debates");
+		var query = new Parse.Query(Debate);
+		query.get(getQueryVariable('did'), {
+		  success: function(debate) {
+			  	$('#debateTitle').html(debate.get('debateTitle'));
+			  	$('#titleProp').html(debate.get('proName'));
+			  	$('#titleOpp').html(debate.get('oppName'));
+
+				proUsername = debate.get('proUsername');
+				oppUsername = debate.get('oppUsername');
+				judgeUsername = debate.get('judgeUsername');
+				
+				proCode = debate.get('proCode');
+				oppCode = debate.get('oppCode');
+				judgeCode = debate.get('judgeCode');
+				guestCode = debate.get('guestCode');
+
+				// Add Sessions Here
+				var apiKey    = "45219192";
+			  	var sessionId = "2_MX40NTIxOTE5Mn5-MTQzMDkyODY3OTc0Nn5QYitBRHZHUUtTNFNhWXdIRDJBK1ZyNkZ-fg";
+			  	var token     = "";
+			  	var nameTagSize = "";
+			  	var publishTo = "";
+			  	var subscriberProperties = "";
+			  	var streamGuestDirection = "L";
+			  	var myName = "";
+
+	if (uid == guestCode) {
+		// GUEST
+	  	token ="T1==cGFydG5lcl9pZD00NTIxOTE5MiZzaWc9NTUwZWY1ZjlmZjVjYzc5ZTczZjk0ZmQwMmU1ZjM1NzNlZTAyNTVlYjpyb2xlPW1vZGVyYXRvciZzZXNzaW9uX2lkPTJfTVg0ME5USXhPVEU1TW41LU1UUXpNRGt5T0RZM09UYzBObjVRWWl0QlJIWkhVVXRUTkZOaFdYZElSREpCSzFaeU5rWi1mZyZjcmVhdGVfdGltZT0xNDMwOTI4Nzg4Jm5vbmNlPTAuOTQyOTM2Mjc1NDAzMTQxMiZleHBpcmVfdGltZT0xNDMzNTIwNjcyJmNvbm5lY3Rpb25fZGF0YT04MDAw"
+
+		nameTagSize = "nameS";
+
+	  	if (streamGuestDirection == "L") {
+	  		console.log("Send guest left");
+		  	publishTo = "streamGuestLeft";
+		  	streamGuestDirection = "R";	  		
+	  	} else {
+	  		console.log("Send guest right");
+		  	publishTo = "streamGuestRight";
+		  	streamGuestDirection = "L";	  			  		
+	  	}
+
+	 	subscriberProperties = {insertMode: 'append', width: 160, height: 120};
+
+	} else if (uid == proCode) {
+		// PROP
+		token = "T1==cGFydG5lcl9pZD00NTIxOTE5MiZzaWc9YzU0NGQzZWYyNmM4MzM2MWQ5N2YxZGNlZTlmYjExZTg5MzU1Zjk5ZDpyb2xlPW1vZGVyYXRvciZzZXNzaW9uX2lkPTJfTVg0ME5USXhPVEU1TW41LU1UUXpNRGt5T0RZM09UYzBObjVRWWl0QlJIWkhVVXRUTkZOaFdYZElSREpCSzFaeU5rWi1mZyZjcmVhdGVfdGltZT0xNDMwOTI4ODYwJm5vbmNlPTAuMjk1NDA5MDI2MzQ5OTMyMjcmZXhwaXJlX3RpbWU9MTQzMzUyMDY3MiZjb25uZWN0aW9uX2RhdGE9ODAwMQ=="
+
+		nameTagSize = "nameL";
+	  	publishTo = "streamProp";
+	 	subscriberProperties = {insertMode: 'append', width: 400, height: 300};
+	 	myName = proUsername;
+	    console.log("creating your name tag: "+ myName);
+
+	} else if (uid == oppCode) {
+		// OPP
+		token = "T1==cGFydG5lcl9pZD00NTIxOTE5MiZzaWc9NjdiMDI4N2Q4NDU5NWViMjhmNzYxNzFmNmJhN2ZkZTM4ZDM3YjM0Mzpyb2xlPW1vZGVyYXRvciZzZXNzaW9uX2lkPTJfTVg0ME5USXhPVEU1TW41LU1UUXpNRGt5T0RZM09UYzBObjVRWWl0QlJIWkhVVXRUTkZOaFdYZElSREpCSzFaeU5rWi1mZyZjcmVhdGVfdGltZT0xNDMwOTI4ODgwJm5vbmNlPTAuMzAzNzU4MTIyNjU4MjAxMzUmZXhwaXJlX3RpbWU9MTQzMzUyMDY3MiZjb25uZWN0aW9uX2RhdGE9ODAwMg=="
+
+		nameTagSize = "nameL";
+	  	publishTo = "streamOpp";
+	 	subscriberProperties = {insertMode: 'append', width: 400, height: 300};
+	 	myName = oppUsername;
+	    console.log("creating your name tag: "+ myName);
+
+	} else if (uid == judgeCode) {
+		// JUDGE
+		token = "T1==cGFydG5lcl9pZD00NTIxOTE5MiZzaWc9Y2EwZTY4ODNmNzU0NWY1OTZkYmI0Mzk2MGIyMjY1MDU0ZjlhZjRlOTpyb2xlPW1vZGVyYXRvciZzZXNzaW9uX2lkPTJfTVg0ME5USXhPVEU1TW41LU1UUXpNRGt5T0RZM09UYzBObjVRWWl0QlJIWkhVVXRUTkZOaFdYZElSREpCSzFaeU5rWi1mZyZjcmVhdGVfdGltZT0xNDMwOTI4ODkwJm5vbmNlPTAuMjYxMjk3NDEwMjI5Njg5MzMmZXhwaXJlX3RpbWU9MTQzMzUyMDY3MiZjb25uZWN0aW9uX2RhdGE9ODAwMw=="
+
+		nameTagSize = "nameM";
+	  	publishTo = 'myJudgeStream';
+	  	myName = judgeUsername;
+	    console.log("creating your name tag: "+ myName);
+
+	 	subscriberProperties = {insertMode: 'append', width: 200, height: 150};
+		  
+		judgeCount++;
+	}	 
+
+	  var session = OT.initSession(apiKey, sessionId);
+	 	 
+	 session.on('streamCreated', function(event) {
+
+		  streamCount++;
+		  var streamWindowId;
+		  var speakerName;
+		  var sessionNameTagSize;
+
+		  if (event.stream.connection.data == guestCode) {
+			  	if (streamGuestDirection == "L") {
+			  		console.log("Send guest left");
+				  	streamWindowId = "streamGuestLeft";
+				  	streamGuestDirection = "R";	  		
+			  	} else {
+			  		console.log("Send guest right");
+				  	streamWindowId = "streamGuestRight";
+				  	streamGuestDirection = "L";	  			  		
+			  	}
+		 	subscriberProperties = {insertMode: 'append', width: 160, height: 120};
+		  } else if (event.stream.connection.data == proCode) {
+		  	streamWindowId = 'streamProp';
+		 	subscriberProperties = {insertMode: 'append', width: 400, height: 300};
+		 	speakerName = proUsername;
+		 	sessionNameTagSize = 'nameL';
+		  } else if (event.stream.connection.data == oppCode) {
+		  	streamWindowId = 'streamOpp';
+		 	subscriberProperties = {insertMode: 'append', width: 400, height: 300};
+		 	speakerName = oppUsername;
+		 	sessionNameTagSize = 'nameL';
+		  } else if (event.stream.connection.data == judgeCode) {
+		  	speakerName = judgeUsername;
+		 	sessionNameTagSize = 'nameM';
+		  	judgeCount++;
+		  	if (judgeCount > 1) {
+		  		$('#judgesTitle').text('Judges');
+		  	}
+		  	
+		  	var judgeStreamDiv = $('<div>', {
+		  		class: 'judgeStream',
+		  		id: 'judge' + event.stream.id
+		  	});
+
+		  	judgeStreamDiv.appendTo($('#streamJudge'));
+
+		  	streamWindowId = judgeStreamDiv.attr('id');
+		 	subscriberProperties = {insertMode: 'append', width: 200, height: 150};
+		  }
+
+		  var subscriber = session.subscribe(event.stream,
+		    streamWindowId,
+		    subscriberProperties,
+		    function (error) {
+		      if (error) {
+		        console.log(error);
+		      } else {
+		        console.log('Subscriber added.  Total: ' + streamCount);
+		      }
+		  });
+
+		  if (event.stream.connection.data != "8000") {
+			  createNameTag(speakerName, sessionNameTagSize, $('#' + streamWindowId));
+		  }
+
+	});
+
+	  session.connect(token, function(error) {
+	    var publisher = OT.initPublisher(publishTo, subscriberProperties);
+	    session.publish(publisher);
+		if (uid != "8000") {
+		    createNameTag(myName, nameTagSize, $('#' + publishTo));
+		    console.log("creating your name tag: "+ myName);
+		}
+	  });
+	  
+		session.on("signal", function(event) {
+			  console.log("Signal sent from connection " + event.from.id);
+			  // Process the event.data property, if there is any data.
+			  if (event.data.substring(0,1) == "s") {
+			  	clearInterval(timerInterval);
+				  $('#propScore').text('');
+				  $('#oppScore').text('');
+
+				  $("#titleProp").addClass('speakerOff');
+				  $("#streamProp").addClass('speakerOffBorder');
+				  $("#titleOpp").addClass('speakerOff');
+				  $("#streamOpp").addClass('speakerOffBorder');
+
+				  $("#titleProp").removeClass('speakerOn');
+				  $("#streamProp").removeClass('speakerOnBorder');
+				  $("#titleOpp").removeClass('speakerOn');
+				  $("#streamOpp").removeClass('speakerOnBorder');
+
+				} else if (event.data.substring(0,1) == "p") {
+				  var displayTimer = $('#propScore');
+				  startTimer(event.data.substring(1), displayTimer);
+
+				  $("#titleProp").addClass('speakerOn');
+				  $("#streamProp").addClass('speakerOnBorder');
+				  $("#titleOpp").addClass('speakerOff');
+				  $("#streamOpp").addClass('speakerOffBorder');
+
+				  $("#titleProp").removeClass('speakerOff');
+				  $("#streamProp").removeClass('speakerOffBorder');
+				  $("#titleOpp").removeClass('speakerOn');
+				  $("#streamOpp").removeClass('speakerOnBorder');
+
+			  } else {
+				  var displayTimer = $('#oppScore');
+				  startTimer(event.data.substring(1), displayTimer);
+				  $("#speakerArrow").attr("src","rightArrow.png");
+
+				  $("#titleProp").removeClass('speakerOn');
+				  $("#streamProp").removeClass('speakerOnBorder');
+				  $("#titleOpp").removeClass('speakerOff');
+				  $("#streamOpp").removeClass('speakerOffBorder');
+
+				  $("#titleProp").addClass('speakerOff');
+				  $("#streamProp").addClass('speakerOffBorder');
+				  $("#titleOpp").addClass('speakerOn');
+				  $("#streamOpp").addClass('speakerOnBorder');
+
+			  }
+
+			});
+
+				// Done Adding Sessions
+
+		  	if (uid == judgeCode) {
+				var times = debate.get('debateTimeCodes');
+				var pAbb = debate.get('proAbbreviation');
+				var oAbb = debate.get('oppAbbreviation');
+				createTimerModal(session, times, pAbb, oAbb);
+			}		  
+
+		  },
+		  error: function(object, error) {
+		    // The object was not retrieved successfully.
+		    // error is a Parse.Error with an error code and message.
+		  }
+		});
+
+		/* hard coded for demo
+		var User = Parse.Object.extend("Users");
+		var queryUser = new Parse.Query(User);
+		queryUser.get($.cookie('token'), {
+		  success: function(user) {
+		  	$('#propSubTitle').html(user.get('firstName') + " " + user.get('lastName'));
+		  },
+		  error: function(object, error) {
+		    // The object was not retrieved successfully.
+		    // error is a Parse.Error with an error code and message.
+		  }
+		});
+		*/
+
+
+		$('#logoffButton').click(function() {
+			window.location.href = "index.html";    					
+		});
+
+	});
+	
+	</script>
+  </head>
+  
+  <body id="zone">
+
+	<div id="menuBar" class="menuBar">
+		<div id="logoffButton">Logoff</div>
+	</div>
+
+	<div id="debateTitle" class="debateTitle">Seriously, the ball should have been given to Marshawn.</div>
+
+	<div id="judgeTimerContainer"></div>
+
+	<div class="mainContainer">
+
+		<div class="debateContainer">
+
+
+			<div class="debateHeader"></div>
+
+			<div class="debateBody">
+
+				<div class="propContainer">
+				</div>
+				
+				<div class="oppContainer">
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+  </body> 
+
+</html>

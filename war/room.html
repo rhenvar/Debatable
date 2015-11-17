@@ -1,0 +1,422 @@
+<html> 
+
+  <head>
+	<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+	<script src='//static.opentok.com/v2/js/opentok.min.js'></script>
+	<script src="jquery-1.11.2.min.js"></script>
+	<script src="jquery.cookie.js"></script>
+	<script src="js/deAuth.js"></script>
+	<script src="js/deClassUser.js"></script>
+	<script src="js/deClassDebate.js"></script>
+	<script src="js/deClassDebateUsers.js"></script>
+	<script src="debatableGlobal.js"></script>
+	<script>
+
+	var streamCount = 0;
+	var judgeCount = 0;
+	var timerInterval;
+	var prop1Username;
+	var prop1Code;
+	var prop2Username;
+	var prop2Code;
+	var opp1Username;
+	var opp1Code;
+	var opp2Username;
+	var opp2Code;
+	var judgeUsername;
+	var judgeCode;
+	var guestCode;
+	var userRole;
+	var publisher;
+	var proName;
+	var oppName;
+	var session;
+	var $modalBox;
+	
+	$( document ).ready(function() {
+
+		getDebate(getQueryVariable('id'), function(response) {
+			var debate = response;	
+		
+			// HARD CODED UNTIL WE FULLY SUPPORT DEBATE FORMATS
+			  	proName = "";
+			  	oppName = "";				  
+			  	$('#debateTitle').html(debate.debateName);
+			  	$('#titleProp').html("");
+			  	$('#titleOpp').html("");
+
+				prop1Username = debate.prop1SpeakerFirstName + " " + debate.prop1SpeakerLastName;
+				prop2Username = debate.prop2SpeakerFirstName + " " + debate.prop2SpeakerLastName;
+				opp1Username = debate.opp1SpeakerFirstName + " " + debate.opp1SpeakerLastName;
+				opp2Username = debate.opp2SpeakerFirstName + " " + debate.opp2SpeakerLastName;
+				judgeUsername = debate.judgeSpeakerFirstName + " " + debate.judgeSpeakerLastName;
+				
+				// Need to get this info from DebatableUsers ? really?
+				prop1Code = debate.prop1Code;
+				prop2Code = debate.prop2Code;
+				opp1Code = debate.opp1Code;
+				opp2Code = debate.opp2Code;
+				judgeCode = debate.judgeCode;
+				guestCode = debate.guestCode;
+
+				// Add Sessions Here
+				var apiKey    = "45241592";
+			  	var sessionId = debate.sessionId;
+			  	var token     = "";
+			  	var nameTagSize = "";
+			  	var publishTo = "";
+			  	var subscriberProperties = "";
+			  	var streamGuestDirection = "L";
+			  	var myName = "";
+
+	if ($.cookie("deUserID") == debate.prop1Id) {
+		// PROP
+		userRole = "prop1";
+		token =  debate.prop1Token;
+
+		nameTagSize = "nameM";
+	  	publishTo = "streamProp1";
+	 	subscriberProperties = {insertMode: 'append', width: 240, height: 180};
+	 	myName = prop1Username;
+	    console.log("creating your name tag: "+ myName);
+
+	} else if ($.cookie("deUserID") == debate.prop2Id) {
+		// PROP
+		userRole = "prop2";
+		token =  debate.prop2Token;
+
+		nameTagSize = "nameM";
+	  	publishTo = "streamProp2";
+	 	subscriberProperties = {insertMode: 'append', width: 240, height: 180};
+	 	myName = prop2Username;
+	    console.log("creating your name tag: "+ myName);
+
+	} else if ($.cookie("deUserID") == debate.opp1Id) {
+		// OPP
+		userRole = "opp1";
+		token =  debate.opp1Token;
+
+		nameTagSize = "nameM";
+	  	publishTo = "streamOpp1";
+	 	subscriberProperties = {insertMode: 'append', width: 240, height: 180};
+	 	myName = opp1Username;
+	    console.log("creating your name tag: "+ myName);
+
+	} else if ($.cookie("deUserID") == debate.opp2Id) {
+		// OPP
+		userRole = "opp2";
+		token =  debate.opp2Token;
+
+		nameTagSize = "nameM";
+	  	publishTo = "streamOpp2";
+	 	subscriberProperties = {insertMode: 'append', width: 240, height: 180};
+	 	myName = opp2Username;
+	    console.log("creating your name tag: "+ myName);
+
+	} else if ($.cookie("deUserID") == debate.judgeId) {
+		// JUDGE
+		userRole = "judge";
+		token =  debate.judgeToken;
+
+		nameTagSize = "nameM";
+	  	publishTo = 'streamJudge';
+	  	myName = judgeUsername;
+	    console.log("creating your name tag: "+ myName);
+
+	 	subscriberProperties = {insertMode: 'append', width: 240, height: 180};
+		  
+		judgeCount++;
+	} else {
+		// GUEST
+		userRole = "guest";
+	  	var guestStreamDiv = $('<div>', {
+	  		class: 'streamGuestWindow',
+	  		id: 'guest-me'
+	  	});
+
+	  	guestStreamDiv.appendTo($('#streamGuest'));
+
+	  	publishTo = guestStreamDiv.attr('id');
+	 	subscriberProperties = {insertMode: 'append', width: 160, height: 120};
+	}
+
+	 session = OT.initSession(apiKey, sessionId);
+	 	 
+	 session.on('streamCreated', function(event) {
+
+		  streamCount++;
+		  var streamWindowId;
+		  var speakerName;
+		  var sessionNameTagSize;
+
+		  if (event.stream.connection.data == guestCode) {
+		 	var guestStreamDiv = $('<div>', {
+		 		class: 'streamGuestWindow',
+		 		id: 'guest' + event.stream.id
+		 	});
+		
+		 	guestStreamDiv.appendTo($('#streamGuest'));
+		
+		 	streamWindowId = guestStreamDiv.attr('id');
+		 	subscriberProperties = {insertMode: 'append', width: 160, height: 120};
+		  } else if (event.stream.connection.data == prop1Code) {
+			  console.log("Prop1Code");
+		  	streamWindowId = 'streamProp1';
+		 	subscriberProperties = {insertMode: 'append', width: 240, height: 180};
+		 	speakerName = prop1Username;
+		 	sessionNameTagSize = 'nameM';
+		  } else if (event.stream.connection.data == prop2Code) {
+			  console.log("Prop2Code");
+		  	streamWindowId = 'streamProp2';
+		 	subscriberProperties = {insertMode: 'append', width: 240, height: 180};
+		 	speakerName = prop2Username;
+		 	sessionNameTagSize = 'nameM';
+		  } else if (event.stream.connection.data == opp1Code) {
+			  console.log("Opp1Code");
+		  	streamWindowId = 'streamOpp1';
+		 	subscriberProperties = {insertMode: 'append', width: 240, height: 180};
+		 	speakerName = opp1Username;
+		 	sessionNameTagSize = 'nameM';
+		  } else if (event.stream.connection.data == opp2Code) {
+			  console.log("Opp2Code");
+		  	streamWindowId = 'streamOpp2';
+		 	subscriberProperties = {insertMode: 'append', width: 240, height: 180};
+		 	speakerName = opp2Username;
+		 	sessionNameTagSize = 'nameM';
+		  } else if (event.stream.connection.data == judgeCode) {
+			  console.log("JudgeCode");
+		  	speakerName = judgeUsername;
+		 	sessionNameTagSize = 'nameM';
+		  	judgeCount++;
+		  	if (judgeCount > 1) {
+		  		$('#judgesTitle').text('Judges');
+		  	}
+		  	
+		  	var judgeStreamDiv = $('<div>', {
+		  		class: 'judgeStream',
+		  		id: 'judge' + event.stream.id
+		  	});
+
+		  	judgeStreamDiv.appendTo($('#streamJudge'));
+
+		  	streamWindowId = judgeStreamDiv.attr('id');
+		 	subscriberProperties = {insertMode: 'append', width: 240, height: 180};
+		  }
+
+		  var subscriber = session.subscribe(event.stream,
+		    streamWindowId,
+		    subscriberProperties,
+		    function (error) {
+		      if (error) {
+		        console.log(error);
+		      } else {
+		        console.log('Subscriber added.  Total: ' + streamCount);
+		      }
+		  });
+
+		  if (event.stream.connection.data != debate.guestCode) {
+			  createNameTag(speakerName, sessionNameTagSize, $('#' + streamWindowId));
+		  }
+
+	});
+
+	  session.connect(token, function(error) {
+	    publisher = OT.initPublisher(publishTo, subscriberProperties);
+	    session.publish(publisher);
+		if ($.cookie("deUserID") == debate.prop1Id || $.cookie("deUserID") == debate.prop2Id || $.cookie("deUserID") == debate.opp1Id  | $.cookie("deUserID") == debate.opp2Id || $.cookie("deUserID") == debate.judgeId) {
+		    createNameTag(myName, nameTagSize, $('#' + publishTo));
+		    console.log("creating your name tag: "+ myName);
+		}
+	  });
+	  
+		session.on("signal", function(event) {
+			  console.log("Signal sent from connection " + event.from.id);
+			  if (event.data == "wp") {
+				  console.log("Prop Wins");
+				  	clearInterval(timerInterval);
+					  $('#propScore').text('');
+					  $('#oppScore').text('');
+
+					  $("#titleProp").addClass('speakerWin');
+					  $("#titleProp").text('Winner!');
+					  $("#streamProp").addClass('speakerWinBorder');
+					  $("#titleOpp").addClass('speakerOff');
+					  $("#titleOpp").text(oppName);
+					  $("#streamOpp").addClass('speakerOffBorder');
+
+					  $("#titleProp").removeClass('speakerOn');
+					  $("#streamProp").removeClass('speakerOnBorder');
+					  $("#titleOpp").removeClass('speakerOn speakerWin');
+					  $("#streamOpp").removeClass('speakerOnBorder speakerWinBorder');
+			  } else if (event.data == "wo") {
+				  console.log("Opp Wins");
+				  	clearInterval(timerInterval);
+					  $('#propScore').text('');
+					  $('#oppScore').text('');
+
+					  $("#titleProp").addClass('speakerOff');
+					  $("#titleProp").text(proName);
+					  $("#streamProp").addClass('speakerOffBorder');
+					  $("#titleOpp").addClass('speakerWin');
+					  $("#titleOpp").text('Winner!');
+					  $("#streamOpp").addClass('speakerWinBorder');
+
+					  $("#titleProp").removeClass('speakerOn speakerWin');
+					  $("#streamProp").removeClass('speakerOnBorder speakerWinBorder');
+					  $("#titleOpp").removeClass('speakerOn');
+					  $("#streamOpp").removeClass('speakerOnBorder');
+			  } else if (event.data.substring(0,1) == "m") {
+				  console.log("mute sent");
+				  // Mute all guests
+				  if (userRole == "guest") {
+					  publisher.publishAudio(false);
+					  console.log("mute guest");
+				  }
+			  } else if (event.data.substring(0,1) == "u") {
+				  // Unmute all guests
+				  if (userRole == "guest") {
+					  publisher.publishAudio(true);
+				  }
+			  } else if (event.data.substring(0,1) == "s") {
+			  	clearInterval(timerInterval);
+				  $('#propScore').text('');
+				  $('#oppScore').text('');
+				  $("#titleProp").html('Proposition');					  					  
+				  $("#titleOpp").html('Opposition');					  					  
+
+				  $("#titleProp").addClass('speakerOff');
+				  $("#streamProp").addClass('speakerOffBorder');
+				  $("#titleOpp").addClass('speakerOff');
+				  $("#streamOpp").addClass('speakerOffBorder');
+
+				  $("#titleProp").removeClass('speakerOn speakerWin');
+				  $("#streamProp").removeClass('speakerOnBorder');
+				  $("#titleOpp").removeClass('speakerOn speakerWin');
+				  $("#streamOpp").removeClass('speakerOnBorder');
+
+				} else if (event.data.substring(0,1) == "p") {
+				  $("#titleOpp").html('Opposition');					  
+				  var displayTimer = $('#propScore');
+				  startTimer(event.data.substring(4), displayTimer);
+
+				  $("#titleProp").addClass('speakerOn');
+				  $("#streamProp").addClass('speakerOnBorder');
+				  $("#titleOpp").addClass('speakerOff');
+				  $("#streamOpp").addClass('speakerOffBorder');
+
+				  $("#titleProp").removeClass('speakerOff speakerWin');
+				  $("#streamProp").removeClass('speakerOffBorder');
+				  $("#titleOpp").removeClass('speakerOn speakerWin');
+				  $("#streamOpp").removeClass('speakerOnBorder');
+
+				  if (event.data.substring(2,3) == "1") {
+					  $("#titleProp").html('Proposition Speaker #1');					  
+				  } else if (event.data.substring(2,3) == "2") {
+					  $("#titleProp").html('Proposition Speaker #2');					  					  
+				  } else if (event.data.substring(2,3) == "r") {
+					  $("#titleProp").html('Proposition Rebuttal');					  					  
+				  }
+
+				} else if (event.data.substring(0,1) == "o") {
+				  $("#titleProp").html('Proposition');					  					  
+				  var displayTimer = $('#oppScore');
+				  startTimer(event.data.substring(4), displayTimer);
+				  $("#speakerArrow").attr("src","rightArrow.png");
+
+				  $("#titleProp").removeClass('speakerOn speakerWin');
+				  $("#streamProp").removeClass('speakerOnBorder');
+				  $("#titleOpp").removeClass('speakerOff speakerWin');
+				  $("#streamOpp").removeClass('speakerOffBorder');
+
+				  $("#titleProp").addClass('speakerOff');
+				  $("#streamProp").addClass('speakerOffBorder');
+				  $("#titleOpp").addClass('speakerOn');
+				  $("#streamOpp").addClass('speakerOnBorder');
+
+				  if (event.data.substring(2,3) == "1") {
+					  $("#titleOpp").html('Opposition Speaker #1');					  
+				  } else if (event.data.substring(2,3) == "2") {
+					  $("#titleOpp").html('Opposition Speaker #2');					  					  
+				  } else if (event.data.substring(2,3) == "r") {
+					  $("#titleOpp").html('Opposition Rebuttal');					  					  
+				  }
+
+			  }
+
+			});
+
+				// Done Adding Sessions
+
+		  	if ($.cookie("deUserID") == debate.judgeId) {
+		  		console.log($.cookie("deUserID"));
+		  		console.log(debate.judgeId);
+				createTimerModalNPDA(session);
+			}
+		});
+
+		$('#logoffButton').click(function() {
+			window.location.href = "home.html";    					
+		});
+
+	});
+	
+	</script>
+  </head>
+  
+  <body id="debate">
+
+	<div id="menuBar" class="menuBar">
+		<div id="logoffButton">Exit the debate</div>
+	</div>
+
+	<div id="debateTitle" class="debateTitleLight">Loading debate details...</div>
+
+	<div class="mainContainer">
+
+		<div class="debateContainer">
+
+			<div class="debateHeader">
+			
+			<table cellpadding="0" cellspacing="0">
+				<tr>
+					<td colspan="2"><div id="titleProp" class="debateWindowTitleBig">Proposition</div><div class="score" id="propScore"></div></td>
+					<td width="240"><div id="judgeTimerContainer"></div></td>
+					<td colspan="2"><div id="titleOpp" class="debateWindowTitleBig">Opposition</div><div class="score" id="oppScore"></div></td>
+				</tr>
+
+				<tr>
+					<td width="240"><div class="debateWindowTitle">Speaker #1</div></td>
+					<td width="240"><div class="debateWindowTitle">Speaker #2</div></td>
+					<td width="240"><div class="debateWindowTitle">Judge</div></td>
+					<td width="240"><div class="debateWindowTitle">Speaker #1</div></td>
+					<td width="240"><div class="debateWindowTitle">Speaker #2</div></td>
+				</tr>
+
+				<tr>
+					<td width="240"><div class="streamWindow speakerOffBorder" id="streamProp1"></div></td>
+					<td width="240"><div class="streamWindow speakerOffBorder" id="streamProp2"></div></td>
+					<td width="240"><div class="streamWindow" id="streamJudge"></div></td>
+					<td width="240"><div class="streamWindow speakerOffBorder" id="streamOpp1"></div></td>
+					<td width="240"><div class="streamWindow speakerOffBorder" id="streamOpp2"></div></td>
+				</tr>
+			</table>
+
+		</div>
+
+	</div>
+
+		<div class="debateContainer">
+
+			<div class="debateHeader">
+				<div class="debateWindowTitle">Guests</div>
+				<div id="streamGuest"></div>
+			</div>
+
+	</div>
+	
+	</div>
+
+  </body> 
+
+</html>

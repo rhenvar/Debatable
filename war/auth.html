@@ -1,0 +1,99 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+		<link rel="stylesheet" type="text/css" href="css/main.css" media="screen" />
+		<script src="jquery-1.11.2.min.js"></script>
+		<script src="jquery.cookie.js"></script>
+		<script src="js/sha1.js"></script>
+		<script src="js/deUtil.js"></script>
+		<script src="js/deClassUser.js"></script>
+		<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.4.2.min.js"></script>
+		<script>
+			$( document ).ready(function() {	
+				
+				var tid = setInterval(mycode, 500);
+				
+				function mycode() {
+					console.log("looping...");
+					if ($('#dots').text() == ". . . .") {
+						$('#dots').text(".");
+					} else if ($('#dots').text() == ". . .") { 
+						$('#dots').text(". . . .");
+					} else if ($('#dots').text() == ". .") {
+						$('#dots').text(". . .");
+					} else if ($('#dots').text() == ".") {
+						$('#dots').text(". .");
+					}
+				}
+
+				function abortTimer() { // to be called when you want to stop the timer
+				  clearInterval(tid);
+				}
+				
+				if ($.cookie('deToken')) {
+					authUserByToken($.cookie('deToken'), function(response) {
+						if (response.id != "Error") {
+							$.removeCookie('deToken')
+							window.location = "index.html";														
+						} else {
+							console.log("Logged in with token.");
+							window.location = "home.html";							
+						}
+					});
+				} else {
+					window.location = "index.html";																			
+				}
+
+				$('#headerLoginButton').click(function() {
+    				if ($('#emailLogin').val() == "") {
+    					alert("Please enter a valid email address");
+    				} else if ($('#passwordLogin').val() == "") {
+    					alert("Please enter your password");
+    				} else {
+        				console.log("Login attempt...");
+        				authByEmailPassword($('#emailLogin').val(), hex_sha1($('#passwordLogin').val() + "shalako"), function(response) {
+        					console.log(response);
+        					$.cookie("deToken", response.token);
+        					window.location = "/home.html";    					
+        				});
+    				}
+    			});
+    			
+    			$('#signupButton').click(function() {
+    				$('#signupButton').text("Please wait...");
+					var user = {};
+					user.id = createUUID();
+					user.email = $('#email').val();
+					user.passwordHashed = hex_sha1($('#password').val() + "shalako");
+					user.firstName = $('#firstName').val();
+					user.lastName = $('#lastName').val();
+					user.school = $('#school').val();
+					user.debateFormats = $('#debateFormats').val();
+					user.createdDate = new Date().getTime();
+					createUser(user, function(response) {
+						if (response.id == "Error" && response.email =="200") {
+							alert("We're sorry, this email address has already been registered.  Please contact support@debatable.co for assistance.");
+						} else if (response.id != "Error") {
+							$.cookie('deToken', response.token);
+							window.location = "/payment.html?email=" + encodeURIComponent(response.email);
+						}
+					});
+    			});
+    			
+			});
+		</script>
+	</head>
+
+	<body id="background">
+		<div class="headerContainer">
+			<a href="index.html"><img src="images/debatable_logo_white.png" height="45" border="0"/></a>
+			<div class="headerRightOptions">
+			</div>
+		</div>
+		
+		<div class="mainContainer">
+			<div class="loadingMessage">Logging in, please wait</div>
+			<div id="dots" class="loadingMessage">. . .</div>
+		</div>
+	</body>
+</html>

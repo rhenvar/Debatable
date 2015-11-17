@@ -1,0 +1,89 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+		<script src="jquery-1.11.2.min.js"></script>
+		<script src="jquery.cookie.js"></script>
+		<script src="js/deClassUser.js"></script>
+		<script src="js/deAuth.js"></script>
+		<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.4.2.min.js"></script>
+		<script>
+			$( document ).ready(function() {
+				Parse.initialize("cuKxFe0wg2ttC2toJ0avhBb4WnapLfkNs7WIxpIL", "KZhVxQhF26dXfwdH6PWjyevSgDKxeyFGedtiZEtR");
+
+    			$('#loginButton').click(function() {
+    				var UserLogin = Parse.Object.extend("Users");
+					var query = new Parse.Query(UserLogin);
+					query.equalTo("email", $('#email').val());
+					query.equalTo("password", $('#password').val());
+					query.find({
+					  success: function(results) {
+					  	if (results.length > 0) {
+					  		console.log("You're logged in!");
+					  		var userObject = results[0];
+					  		$.cookie("token", userObject.id);
+					  		$.cookie("firstName", userObject.get('firstName'));
+					  		// Go to user home page
+		    				window.location.href = "home.html";    					
+					  	} else {
+		    				alert("Email / password not found, please try again.");
+		    				$('#email').val("");
+		    				$('#password').val("");
+					  	}
+					    console.log("Successfully retrieved " + results.length + " scores.");
+					  },
+					  error: function(error) {
+					    console.log("Error: " + error.code + " " + error.message);
+					  }
+					});
+    			});
+
+    			$('#guestButton').click(function() {
+					// New code
+    				var codeLogin = Parse.Object.extend("DebateCodes");
+					var query = new Parse.Query(codeLogin);
+					query.equalTo("code", $('#debateId').val());
+					query.find({
+					  success: function(results) {
+					  	if (results.length > 0) {
+					  		console.log("You're logged in!");
+					  		var userObject = results[0];
+					  		$.cookie("debateCode", userObject.get('code'));
+					  		$.cookie("debateId", userObject.get('debateId'));
+		    				window.location.href = "live.html?did=" + userObject.get('debateId') + "&uid=" + userObject.get('code');
+					  	} else {
+		    				alert("This code is invalid, please try again.");
+		    				$('#debateId').val("");
+					  	}
+					    console.log("Successfully retrieved " + results.length + " code results.");
+					  },
+					  error: function(error) {
+					    console.log("Error: " + error.code + " " + error.message);
+					  }
+					});
+					// End new code
+    			});
+    			
+    			$('#testButton').click(function() {
+    				window.location.href = "test.html";    					
+    			});
+			});
+		</script>
+	</head>
+
+	<body id="background">
+		<div class="centerPage">
+		<img src="debatable_logo.png" width="600" class="mainLogo" />
+			<div class="loginSection">
+				<input class="loginForm" type="text" id="debateId" placeholder="Enter Your Code" />
+				<div id="guestButton" class="guestButton">Join the Debate</div>
+			</div>			
+
+			<hr class="formDivider" />
+
+			<div class="loginSection">
+				<div id="testButton" class="testButton">Test Your Audio/Video</div>
+			</div>			
+
+		</div>
+	</body>
+</html>

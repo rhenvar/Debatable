@@ -1,0 +1,109 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+		<link rel="stylesheet" type="text/css" href="css/main.css" media="screen" />
+		<script src="jquery-1.11.2.min.js"></script>
+		<script src="jquery.cookie.js"></script>
+		<script src="js/sha1.js"></script>
+		<script src="js/deUtil.js"></script>
+		<script src="js/deClassUser.js"></script>
+		<script>
+			$( document ).ready(function() {	
+				var token = getUrlParam('token');
+				console.log(token);
+				authUserByToken(token, function(response) {
+					console.log(response);
+					if (response.id == "Error") {
+						alert("The was an error updating your password, please refresh the page and try again.  If you continue to experience this issue, please contact support@debatable.co");    						
+					} else {
+						$.cookie("deToken", token);
+						$.cookie("deUserID", response.id);
+						$.cookie("deFirstName", response.firstName);
+						$.cookie("deLastName", response.LastName);
+					}
+				})
+				
+				$('#headerLoginButton').click(function() {
+					$('#headerLoginButton').text("Please wait...");
+    				if ($('#emailLogin').val() == "") {
+    					alert("Please enter a valid email address");
+    				} else if ($('#passwordLogin').val() == "") {
+    					alert("Please enter your password");
+    				} else {
+        				console.log("Login attempt...");
+        				authByEmailPassword($('#emailLogin').val(), hex_sha1($('#passwordLogin').val() + "shalako"), function(response) {
+        					console.log(response);
+        					$.cookie("deToken", response.token);
+        					$.cookie("deUserID", response.id);
+        					$.cookie("deFirstName", response.firstName);
+        					$.cookie("deLastName", response.LastName);
+        					window.location = "/home.html";    					
+        				});
+    				}
+    			});
+    			
+    			$('#saveButton').click(function() {
+    				if ($('#password').val() == $('#repeatPassword').val()) {
+        				$('#saveButton').text("Please wait...");
+    					if(!$.cookie("deUserID")) {
+							alert("The was an error updating your password, please refresh the page and try again.  If you continue to experience this issue, please contact support@debatable.co");    						
+    					} else {
+            				var user = {};
+        					user.id = $.cookie("deUserID");
+        					user.passwordHashed = hex_sha1($('#password').val() + "shalako");    						
+        					user.validated = "Yes";    						
+        					updateUser(user, function(response) {
+        						console.log(response);
+	    						if (response.id == "Error") {
+	    							alert("The was an error updating your password, please refresh the page and try again.  If you continue to experience this issue, please contact support@debatable.co");    						
+	    						} else {
+	            					$.cookie("deToken", response.token);
+	            					$.cookie("deUserID", response.id);
+	            					$.cookie("deFirstName", response.firstName);
+	            					$.cookie("deLastName", response.lastName);
+	            					$.cookie("deEmail", response.email);
+									window.location = "/home.html";	    							
+	    						}
+        					});
+    					}
+    				} else {
+    					alert("Your passwords do not match, please try again.");
+    					$('#password').val("");
+    					$('#repeatPassword').val("");
+    				}
+    			});
+    			
+			});
+		</script>
+	</head>
+
+	<body id="background">
+		<div class="headerContainer">
+			<a href="index.html"><img src="images/debatable_logo_white.png" height="45" border="0"/></a>
+		</div>
+		
+		<div class="mainContainer">
+
+			<div class="titleCenter">Password Reset</div>
+			
+			<div class="passwordResetForm">
+				<div class="regFormRow">
+					<div class="regFormLabel">Password :</div>
+					<div class="regFormField"><input id="password" class="regForm" type="password" placeholder="password" /></div>
+				</div>
+	
+				<div class="regFormRow">
+					<div class="regFormLabel">Repeat :</div>
+					<div class="regFormField"><input id="repeatPassword" class="regForm" type="password" placeholder="password" /></div>
+				</div>
+	
+				<input type="hidden" id="userId" />
+				
+				<div id="saveButton" class="regButton">Save</div>			
+			</div>
+
+
+
+		</div>
+	</body>
+</html>

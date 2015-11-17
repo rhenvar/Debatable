@@ -1,0 +1,1028 @@
+{
+  "extends" : "thirdParty.api",
+  "abstract" : false,
+  "root" : "https://debatable-app.appspot.com/_ah/api",
+  "name" : "debatable",
+  "version" : "v1",
+  "defaultVersion" : false,
+  "adapter" : {
+    "bns" : "https://debatable-app.appspot.com/_ah/spi",
+    "deadline" : 65.0,
+    "type" : "lily"
+  },
+  "auth" : {
+    "allowCookieAuth" : false
+  },
+  "frontendLimits" : {
+    "unregisteredUserQps" : -1,
+    "unregisteredQps" : -1,
+    "unregisteredDaily" : -1,
+    "rules" : [ ]
+  },
+  "cacheControl" : {
+    "type" : "no-cache",
+    "maxAge" : 0
+  },
+  "ownerDomain" : "debatable.co",
+  "ownerName" : "debatable.co",
+  "methods" : {
+    "debatable.insertDebate" : {
+      "path" : "debate",
+      "httpMethod" : "POST",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.DebateEndpoint.insertDebate",
+      "request" : {
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.getDebate" : {
+      "path" : "debate/{id}",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.DebateEndpoint.getDebate",
+      "request" : {
+        "parameters" : {
+          "id" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.updateDebate" : {
+      "path" : "debate",
+      "httpMethod" : "PUT",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.DebateEndpoint.updateDebate",
+      "request" : {
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.removeDebate" : {
+      "path" : "debate/{id}",
+      "httpMethod" : "DELETE",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.DebateEndpoint.removeDebate",
+      "request" : {
+        "parameters" : {
+          "id" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "empty"
+      }
+    },
+    "debatable.listDebate" : {
+      "path" : "debate",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.DebateEndpoint.listDebate",
+      "request" : {
+        "parameters" : {
+          "cursor" : {
+            "type" : "string",
+            "required" : false
+          },
+          "limit" : {
+            "type" : "int32",
+            "required" : false
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.insertContactList" : {
+      "path" : "contactlist",
+      "httpMethod" : "POST",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.ContactListEndpoint.insertContactList",
+      "request" : {
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.removeContactList" : {
+      "path" : "contactlist/{id}",
+      "httpMethod" : "DELETE",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.ContactListEndpoint.removeContactList",
+      "request" : {
+        "parameters" : {
+          "id" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "empty"
+      }
+    },
+    "debatable.getContactsByUserId" : {
+      "path" : "getContactsByUserId/{userId}",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.ContactListEndpoint.getContactsByUserId",
+      "request" : {
+        "parameters" : {
+          "cursor" : {
+            "type" : "string",
+            "required" : false
+          },
+          "limit" : {
+            "type" : "int32",
+            "required" : false
+          },
+          "userId" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.updateContactList" : {
+      "path" : "contactlist",
+      "httpMethod" : "PUT",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.ContactListEndpoint.updateContactList",
+      "request" : {
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.listContactList" : {
+      "path" : "contactlist",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.ContactListEndpoint.listContactList",
+      "request" : {
+        "parameters" : {
+          "cursor" : {
+            "type" : "string",
+            "required" : false
+          },
+          "limit" : {
+            "type" : "int32",
+            "required" : false
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.getContactList" : {
+      "path" : "contactlist/{id}",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.ContactListEndpoint.getContactList",
+      "request" : {
+        "parameters" : {
+          "id" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.updateDebateUsers" : {
+      "path" : "debateusers",
+      "httpMethod" : "PUT",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.DebateUsersEndpoint.updateDebateUsers",
+      "request" : {
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.removeDebateUsers" : {
+      "path" : "debateusers/{id}",
+      "httpMethod" : "DELETE",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.DebateUsersEndpoint.removeDebateUsers",
+      "request" : {
+        "parameters" : {
+          "id" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "empty"
+      }
+    },
+    "debatable.insertDebateUsers" : {
+      "path" : "debateusers",
+      "httpMethod" : "POST",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.DebateUsersEndpoint.insertDebateUsers",
+      "request" : {
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.getDebatesByUserId" : {
+      "path" : "getDebatesByUserId/{userId}",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.DebateUsersEndpoint.getDebatesByUserId",
+      "request" : {
+        "parameters" : {
+          "cursor" : {
+            "type" : "string",
+            "required" : false
+          },
+          "limit" : {
+            "type" : "int32",
+            "required" : false
+          },
+          "userId" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.getDebateUsers" : {
+      "path" : "debateusers/{id}",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.DebateUsersEndpoint.getDebateUsers",
+      "request" : {
+        "parameters" : {
+          "id" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.listDebateUsers" : {
+      "path" : "debateusers",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.DebateUsersEndpoint.listDebateUsers",
+      "request" : {
+        "parameters" : {
+          "cursor" : {
+            "type" : "string",
+            "required" : false
+          },
+          "limit" : {
+            "type" : "int32",
+            "required" : false
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.getUser" : {
+      "path" : "user/{id}",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.UserEndpoint.getUser",
+      "request" : {
+        "parameters" : {
+          "id" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.authUserByToken" : {
+      "path" : "authbytoken/{token}",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.UserEndpoint.authUserByToken",
+      "request" : {
+        "parameters" : {
+          "token" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.listUser" : {
+      "path" : "user",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.UserEndpoint.listUser",
+      "request" : {
+        "parameters" : {
+          "cursor" : {
+            "type" : "string",
+            "required" : false
+          },
+          "limit" : {
+            "type" : "int32",
+            "required" : false
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.insertUser" : {
+      "path" : "user",
+      "httpMethod" : "POST",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.UserEndpoint.insertUser",
+      "request" : {
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.updateUser" : {
+      "path" : "user",
+      "httpMethod" : "PUT",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.UserEndpoint.updateUser",
+      "request" : {
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.removeUser" : {
+      "path" : "user/{id}",
+      "httpMethod" : "DELETE",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.UserEndpoint.removeUser",
+      "request" : {
+        "parameters" : {
+          "id" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "empty"
+      }
+    },
+    "debatable.authUser" : {
+      "path" : "auth/{email}/{password}",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.UserEndpoint.authUser",
+      "request" : {
+        "parameters" : {
+          "email" : {
+            "type" : "string",
+            "required" : true
+          },
+          "password" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.isUserValidated" : {
+      "path" : "isuservalidated/{userId}",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.UserEndpoint.isUserValidated",
+      "request" : {
+        "parameters" : {
+          "userId" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "debatable.resetPassword" : {
+      "path" : "resetpassword/{email}",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "co.debatable.UserEndpoint.resetPassword",
+      "request" : {
+        "parameters" : {
+          "email" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "empty"
+      }
+    }
+  },
+  "descriptor" : {
+    "schemas" : {
+      "Debate" : {
+        "id" : "Debate",
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "createdBy" : {
+            "type" : "string"
+          },
+          "sessionId" : {
+            "type" : "string"
+          },
+          "debateName" : {
+            "type" : "string"
+          },
+          "debateFormat" : {
+            "type" : "string"
+          },
+          "prop1SpeakerFirstName" : {
+            "type" : "string"
+          },
+          "prop1SpeakerLastName" : {
+            "type" : "string"
+          },
+          "prop1Email" : {
+            "type" : "string"
+          },
+          "prop1Id" : {
+            "type" : "string"
+          },
+          "prop1Code" : {
+            "type" : "string"
+          },
+          "prop1Token" : {
+            "type" : "string"
+          },
+          "prop2SpeakerFirstName" : {
+            "type" : "string"
+          },
+          "prop2SpeakerLastName" : {
+            "type" : "string"
+          },
+          "prop2Email" : {
+            "type" : "string"
+          },
+          "prop2Id" : {
+            "type" : "string"
+          },
+          "prop2Code" : {
+            "type" : "string"
+          },
+          "prop2Token" : {
+            "type" : "string"
+          },
+          "opp1SpeakerFirstName" : {
+            "type" : "string"
+          },
+          "opp1SpeakerLastName" : {
+            "type" : "string"
+          },
+          "opp1Email" : {
+            "type" : "string"
+          },
+          "opp1Id" : {
+            "type" : "string"
+          },
+          "opp1Code" : {
+            "type" : "string"
+          },
+          "opp1Token" : {
+            "type" : "string"
+          },
+          "opp2SpeakerFirstName" : {
+            "type" : "string"
+          },
+          "opp2SpeakerLastName" : {
+            "type" : "string"
+          },
+          "opp2Email" : {
+            "type" : "string"
+          },
+          "opp2Id" : {
+            "type" : "string"
+          },
+          "opp2Code" : {
+            "type" : "string"
+          },
+          "opp2Token" : {
+            "type" : "string"
+          },
+          "judgeSpeakerFirstName" : {
+            "type" : "string"
+          },
+          "judgeSpeakerLastName" : {
+            "type" : "string"
+          },
+          "judgeEmail" : {
+            "type" : "string"
+          },
+          "judgeId" : {
+            "type" : "string"
+          },
+          "judgeCode" : {
+            "type" : "string"
+          },
+          "judgeToken" : {
+            "type" : "string"
+          },
+          "timerFormat" : {
+            "type" : "string"
+          },
+          "guestCode" : {
+            "type" : "string"
+          },
+          "guestToken" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CollectionResponse_Debate" : {
+        "id" : "CollectionResponse_Debate",
+        "type" : "object",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "Debate"
+            }
+          },
+          "nextPageToken" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ContactList" : {
+        "id" : "ContactList",
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "ownerId" : {
+            "type" : "string"
+          },
+          "contactId" : {
+            "type" : "string"
+          },
+          "contactFirstName" : {
+            "type" : "string"
+          },
+          "contactLastName" : {
+            "type" : "string"
+          },
+          "contactEmail" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ContactListCollection" : {
+        "id" : "ContactListCollection",
+        "type" : "object",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "ContactList"
+            }
+          }
+        }
+      },
+      "CollectionResponse_ContactList" : {
+        "id" : "CollectionResponse_ContactList",
+        "type" : "object",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "ContactList"
+            }
+          },
+          "nextPageToken" : {
+            "type" : "string"
+          }
+        }
+      },
+      "DebateUsers" : {
+        "id" : "DebateUsers",
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "debateId" : {
+            "type" : "string"
+          },
+          "userId" : {
+            "type" : "string"
+          },
+          "userEmail" : {
+            "type" : "string"
+          },
+          "role" : {
+            "type" : "string"
+          },
+          "isOwner" : {
+            "type" : "string"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "token" : {
+            "type" : "string"
+          }
+        }
+      },
+      "DebateUsersCollection" : {
+        "id" : "DebateUsersCollection",
+        "type" : "object",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "DebateUsers"
+            }
+          }
+        }
+      },
+      "CollectionResponse_DebateUsers" : {
+        "id" : "CollectionResponse_DebateUsers",
+        "type" : "object",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "DebateUsers"
+            }
+          },
+          "nextPageToken" : {
+            "type" : "string"
+          }
+        }
+      },
+      "User" : {
+        "id" : "User",
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "passwordHashed" : {
+            "type" : "string"
+          },
+          "token" : {
+            "type" : "string"
+          },
+          "validationCode" : {
+            "type" : "string"
+          },
+          "validated" : {
+            "type" : "string"
+          },
+          "firstName" : {
+            "type" : "string"
+          },
+          "lastName" : {
+            "type" : "string"
+          },
+          "school" : {
+            "type" : "string"
+          },
+          "debateFormats" : {
+            "type" : "string"
+          },
+          "createdDate" : {
+            "type" : "string",
+            "format" : "int64"
+          },
+          "modifiedDate" : {
+            "type" : "string",
+            "format" : "int64"
+          },
+          "createdBy" : {
+            "type" : "string"
+          },
+          "modifiedBy" : {
+            "type" : "string"
+          },
+          "paypalConfirmation" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CollectionResponse_User" : {
+        "id" : "CollectionResponse_User",
+        "type" : "object",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "User"
+            }
+          },
+          "nextPageToken" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "methods" : {
+      "co.debatable.DebateEndpoint.insertDebate" : {
+        "request" : {
+          "$ref" : "Debate"
+        },
+        "response" : {
+          "$ref" : "Debate"
+        }
+      },
+      "co.debatable.DebateEndpoint.getDebate" : {
+        "response" : {
+          "$ref" : "Debate"
+        }
+      },
+      "co.debatable.DebateEndpoint.updateDebate" : {
+        "request" : {
+          "$ref" : "Debate"
+        },
+        "response" : {
+          "$ref" : "Debate"
+        }
+      },
+      "co.debatable.DebateEndpoint.removeDebate" : {
+      },
+      "co.debatable.DebateEndpoint.listDebate" : {
+        "response" : {
+          "$ref" : "CollectionResponse_Debate"
+        }
+      },
+      "co.debatable.ContactListEndpoint.insertContactList" : {
+        "request" : {
+          "$ref" : "ContactList"
+        },
+        "response" : {
+          "$ref" : "ContactList"
+        }
+      },
+      "co.debatable.ContactListEndpoint.removeContactList" : {
+      },
+      "co.debatable.ContactListEndpoint.getContactsByUserId" : {
+        "response" : {
+          "$ref" : "ContactListCollection"
+        }
+      },
+      "co.debatable.ContactListEndpoint.updateContactList" : {
+        "request" : {
+          "$ref" : "ContactList"
+        },
+        "response" : {
+          "$ref" : "ContactList"
+        }
+      },
+      "co.debatable.ContactListEndpoint.listContactList" : {
+        "response" : {
+          "$ref" : "CollectionResponse_ContactList"
+        }
+      },
+      "co.debatable.ContactListEndpoint.getContactList" : {
+        "response" : {
+          "$ref" : "ContactList"
+        }
+      },
+      "co.debatable.DebateUsersEndpoint.updateDebateUsers" : {
+        "request" : {
+          "$ref" : "DebateUsers"
+        },
+        "response" : {
+          "$ref" : "DebateUsers"
+        }
+      },
+      "co.debatable.DebateUsersEndpoint.removeDebateUsers" : {
+      },
+      "co.debatable.DebateUsersEndpoint.insertDebateUsers" : {
+        "request" : {
+          "$ref" : "DebateUsers"
+        },
+        "response" : {
+          "$ref" : "DebateUsers"
+        }
+      },
+      "co.debatable.DebateUsersEndpoint.getDebatesByUserId" : {
+        "response" : {
+          "$ref" : "DebateUsersCollection"
+        }
+      },
+      "co.debatable.DebateUsersEndpoint.getDebateUsers" : {
+        "response" : {
+          "$ref" : "DebateUsers"
+        }
+      },
+      "co.debatable.DebateUsersEndpoint.listDebateUsers" : {
+        "response" : {
+          "$ref" : "CollectionResponse_DebateUsers"
+        }
+      },
+      "co.debatable.UserEndpoint.getUser" : {
+        "response" : {
+          "$ref" : "User"
+        }
+      },
+      "co.debatable.UserEndpoint.authUserByToken" : {
+        "response" : {
+          "$ref" : "User"
+        }
+      },
+      "co.debatable.UserEndpoint.listUser" : {
+        "response" : {
+          "$ref" : "CollectionResponse_User"
+        }
+      },
+      "co.debatable.UserEndpoint.insertUser" : {
+        "request" : {
+          "$ref" : "User"
+        },
+        "response" : {
+          "$ref" : "User"
+        }
+      },
+      "co.debatable.UserEndpoint.updateUser" : {
+        "request" : {
+          "$ref" : "User"
+        },
+        "response" : {
+          "$ref" : "User"
+        }
+      },
+      "co.debatable.UserEndpoint.removeUser" : {
+      },
+      "co.debatable.UserEndpoint.authUser" : {
+        "response" : {
+          "$ref" : "User"
+        }
+      },
+      "co.debatable.UserEndpoint.isUserValidated" : {
+        "response" : {
+          "$ref" : "User"
+        }
+      },
+      "co.debatable.UserEndpoint.resetPassword" : {
+      }
+    }
+  }
+}

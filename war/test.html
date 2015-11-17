@@ -1,0 +1,108 @@
+<html> 
+
+  <head>
+	<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+	<script src='//static.opentok.com/v2/js/opentok.min.js'></script>
+	<script src="jquery-1.11.2.min.js"></script>
+	<script src="jquery.cookie.js"></script>
+	<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.4.2.min.js"></script>
+	<script>
+		function createNameTag(name, size, $appendToElement) {
+			var nameTagDiv = $('<div>', {
+				class: 'nameTag ' + size
+			});
+			nameTagDiv.text(name);
+			nameTagDiv.hide();
+			var destination = $appendToElement.offset();
+			console.log(destination);
+			nameTagDiv.appendTo($appendToElement);
+			nameTagDiv.css({position: 'absolute', top: destination.top + $appendToElement.outerHeight() - nameTagDiv.outerHeight(), left: destination.left});
+			nameTagDiv.show();
+		}
+
+		function getQueryVariable(variable)
+		{
+		       var query = window.location.search.substring(1);
+		       var vars = query.split("&");
+		       for (var i=0;i<vars.length;i++) {
+		               var pair = vars[i].split("=");
+		               if(pair[0] == variable){return pair[1];}
+		       }
+		       return(false);
+		}
+
+		var uid = getQueryVariable('uid');
+
+	$( document ).ready(function() {
+		$('#testButton').click(function() {
+			window.location.href = "index.html";    					
+		});
+	});
+	
+	</script>
+  </head>
+  
+  <body id="debate">
+  	<script type="text/javascript">
+
+	  var apiKey    = "45219192";
+	  var sessionId = "2_MX40NTIxOTE5Mn5-MTQzMDkyODY3OTc0Nn5QYitBRHZHUUtTNFNhWXdIRDJBK1ZyNkZ-fg";
+	  var token     = "";
+	  var nameTagSize = "";
+	  var publishTo = "";
+	  var subscriberProperties = "";
+	  var streamGuestDirection = "L";
+	  var myName = "";
+
+		token = "T1==cGFydG5lcl9pZD00NTIxOTE5MiZzaWc9YzU0NGQzZWYyNmM4MzM2MWQ5N2YxZGNlZTlmYjExZTg5MzU1Zjk5ZDpyb2xlPW1vZGVyYXRvciZzZXNzaW9uX2lkPTJfTVg0ME5USXhPVEU1TW41LU1UUXpNRGt5T0RZM09UYzBObjVRWWl0QlJIWkhVVXRUTkZOaFdYZElSREpCSzFaeU5rWi1mZyZjcmVhdGVfdGltZT0xNDMwOTI4ODYwJm5vbmNlPTAuMjk1NDA5MDI2MzQ5OTMyMjcmZXhwaXJlX3RpbWU9MTQzMzUyMDY3MiZjb25uZWN0aW9uX2RhdGE9ODAwMQ=="
+
+		nameTagSize = "nameL";
+	  	publishTo = "testStream";
+	 	subscriberProperties = {insertMode: 'append', width: 400, height: 300};
+	 	myName = "";
+
+	  var session = OT.initSession(apiKey, sessionId);
+	 	 
+	  session.connect(token, function(error) {
+	    var publisher = OT.initPublisher(publishTo, subscriberProperties);
+	    session.publish(publisher);
+	    // createNameTag(myName, nameTagSize, $('#' + publishTo));
+	  });
+	</script>
+
+	<div id="debateTitle" class="debateTitle">Welcome to Debatable!</div>
+
+	<div id="judgeTimerContainer"></div>
+
+	<div class="mainContainer">
+
+		<div class="debateContainer">
+
+			<div class="debateHeader">
+
+					<div id="testButton" class="testButton">Return to Login Page</div>
+
+					<div class="testInfo">Use the latest Chrome or Firefox browsers for the best experience.</div>
+
+					<div class="testInfo">You will need a internal or external microphone and camera to use debatable.</div>
+
+					<div class="testInfo">For the best audio, please use earbuds or a headset.</div>
+
+					<div class="testInfo">Typing on your keyboard can create a loud, distracting noise.</div>
+
+					<div class="testInfo">Please click on the "Allow" button above to test your audio / video connection.</div>
+
+					<div id="testStream" class="testStreamWindow"></div>
+
+			</div>
+
+			<div class="debateBody"></div>
+
+		</div>
+
+	</div>
+
+  </body> 
+
+</html>

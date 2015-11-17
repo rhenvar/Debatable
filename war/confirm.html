@@ -1,0 +1,96 @@
+<html> 
+
+  <head>
+	<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+	<link rel="stylesheet" type="text/css" href="css/main.css" media="screen" />
+	<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+		<script src="jquery-1.11.2.min.js"></script>
+		<script src="jquery.cookie.js"></script>
+		<script src="js/deAuth.js"></script>
+		<script src="js/deUtil.js"></script>
+		<script src="js/deClassUser.js"></script>
+		<script>
+			$( document ).ready(function() {
+				$('#userName').text($.cookie("deFirstName"));
+				
+				$('#welcomeMessage').html($.cookie("deFirstName") + ", thank you for joining Debatable.<br/>Please complete your profile below.");
+				
+				$('#skipLink').click(function() {
+			    	window.location = "home.html";					
+				});
+
+				var paypalConfirmationToken = getUrlParam("auth");
+				
+				authUserByToken($.cookie("deToken"), function(response) {
+					console.log(response);
+					response.paypalConfirmation = paypalConfirmationToken;
+					updateUser(response, function(resp) {
+						console.log(resp);
+					});					
+				});
+
+				$('#saveProfileButton').click(function() {
+					$('#saveProfileButton').text("Please wait...");
+					authUserByToken($.cookie("deToken"), function(response) {
+						response.school = $('#school').val();
+						response.debateFormats = $('#debateFormats').val();
+						updateUser(response, function(resp) {
+							console.log(resp);
+					    	window.location = "home.html";					
+						});										
+					});
+				});					
+				
+				$('#logoutButton').click(function() {
+					$.removeCookie("deToken");
+					$.removeCookie("deUserID");
+					$.removeCookie("deFirstName");
+					$.removeCookie("deLastName");
+			    	window.location = "index.html";					
+				});
+
+			});
+		</script>
+  </head>
+  
+  <body id="background">
+		<div class="headerContainer">
+			<a href="index.html"><img src="images/debatable_logo_white.png" height="45" border="0"/></a>
+			<div class="headerRightOptions">
+				Hello <span id="userName"></span>&nbsp;&nbsp;|&nbsp;&nbsp;<span id="logoutButton" class="textButton">Logout</span>
+			</div>
+		</div>
+
+
+		<div class="mainContainer">
+			<div class="titleCenter" id="welcomeMessage"></div>
+
+			<div class="regFormRow">
+				<div class="regFormLabel">School / Organization :</div>
+				<div class="regFormField"><input id="school" class="regForm" type="text" placeholder="school / organization" /></div>
+			</div>
+
+			<div class="regFormRow">
+				<div class="regFormLabel">Debate Format :</div>
+				<div class="regFormField">
+					<select id="debateFormats" class="regForm">
+						<option value="0">Please select your preferred debate format</option>
+						<option value="1">Team Policy Debate</option>
+						<option value="2">Lincoln-Douglas Debate</option>
+						<option value="3">NDT Debate</option>
+						<option value="4">CEDA Debate</option>
+						<option value="5">Parliamentary Debate</option>
+						<option value="6">Middle School Debate</option>
+						<option value="7">No Preference / Not Sure</option>
+					</select>
+				</div>
+			</div>
+
+			<div id="saveProfileButton" class="regButton">Save</div>
+
+			<div id="skipLink">skip this for now</div>
+		</div>
+
+  </body> 
+
+</html>

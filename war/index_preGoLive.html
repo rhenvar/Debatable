@@ -1,0 +1,83 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+		<link rel="stylesheet" type="text/css" href="css/main.css" media="screen" />
+		<script src="jquery-1.11.2.min.js"></script>
+		<script src="jquery.cookie.js"></script>
+		<script src="js/sha1.js"></script>
+		<script src="js/deUtil.js"></script>
+		<script src="js/deClassUser.js"></script>
+		<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.4.2.min.js"></script>		
+
+		<script>
+			if ($.cookie("deToken")) {
+				window.location = "home.html";
+			}
+		</script>
+
+		<script>
+		$( document ).ready(function() {
+				$('#headerLoginButton').click(function() {
+    				if ($('#emailLogin').val() == "") {
+    					alert("Please enter a valid email address");
+    				} else if ($('#passwordLogin').val() == "") {
+    					alert("Please enter your password");
+    				} else {
+        				console.log("Login attempt...");
+        				authByEmailPassword($('#emailLogin').val(), hex_sha1($('#passwordLogin').val() + "shalako"), function(response) {
+        					console.log(response);
+        					$.cookie("deToken", response.token);
+        					$.cookie("deUserID", response.id);
+        					$.cookie("deFirstName", response.firstName);
+        					$.cookie("deLastName", response.LastName);
+        					window.location = "/home.html";    					
+        				});
+    				}
+    			});
+    			
+    			$('#signupButton').click(function() {
+    				$('#signupButton').text("Please wait...");
+					var user = {};
+					user.id = createUUID();
+					user.email = $('#email').val();
+					user.passwordHashed = hex_sha1($('#password').val() + "shalako");
+					user.firstName = $('#firstName').val();
+					user.lastName = $('#lastName').val();
+					user.school = $('#school').val();
+					user.debateFormats = $('#debateFormats').val();
+					user.createdDate = new Date().getTime();
+					createUser(user, function(response) {
+						if (response.id == "Error" && response.email =="200") {
+							alert("We're sorry, this email address has already been registered.  Please contact support@debatable.co for assistance.");
+						} else if (response.id != "Error") {
+							$.cookie('deToken', response.token);
+							window.location = "/payment.html?email=" + encodeURIComponent(response.email);
+						}
+					});
+    			});
+
+    			$('#registerButton').click(function() {
+    				window.location = "register.html";
+    			});
+
+			});
+		</script>
+	</head>
+
+	<body id="background">
+		<div class="headerContainer">
+			<a href="index.html"><img src="images/debatable_logo_white.png" height="45" border="0"/></a>
+			<div class="headerRightOptions">
+				Already have an account?
+				<input id="emailLogin" class="headerLogin headerLoginEmail" type="text" placeholder="email" />
+				<input id="passwordLogin" class="headerLogin headerLoginPassword" type="password" placeholder="password" />
+				<div id="headerLoginButton" class="headerLoginButton">Login</div>
+			</div>
+		</div>
+		
+		<div class="mainContainer">
+		<div class="missionStatement">We want to give debaters the perfect tool to participate in debate with anyone, anywhere, and at anytime because we believe education to be a driving force of a better future; debate, as we all know, is a driving force of academic success.</div>
+		<div id="registerButton" class="newDebateButton">Free Trial</div>
+		</div>
+	</body>
+</html>

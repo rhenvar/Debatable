@@ -1,0 +1,69 @@
+<html> 
+
+  <head>
+	<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+	<link rel="stylesheet" type="text/css" href="css/main.css" media="screen" />
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+		<script src="jquery-1.11.2.min.js"></script>
+		<script src="jquery.cookie.js"></script>
+		<script src="js/deAuth.js"></script>
+		<script src="js/deClassUser.js"></script>
+		<script src="js/deClassDebate.js"></script>
+		<script src="js/deClassDebateUsers.js"></script>
+		<script>
+			$( document ).ready(function() {
+				$('#userName').text($.cookie("deFirstName"));
+				
+				$('#createDebate').click(function() {
+			    	window.location = "new-debate.html";					
+				});
+
+				$('#logoutButton').click(function() {
+					$.removeCookie("deToken");
+					$.removeCookie("deUserID");
+					$.removeCookie("deFirstName");
+					$.removeCookie("deLastName");
+					$.removeCookie("deEmail");
+			    	window.location = "index.html";					
+				});
+
+				console.log("MY userId: " + $.cookie("deUserID"));
+				getDebatesByUserId($.cookie("deUserID"), function(response) {
+					for (var obj in response.items) {
+							console.log(response.items[obj].debateId);
+							getDebate(response.items[obj].debateId, function(debateResp) {	
+								console.log("found one");
+								var debateDetailsHtml = "<div class='debateHomeListing'>";
+								debateDetailsHtml += "<div class='debateListingLink'><a href='room.html?id=" + debateResp.id + "'>" + debateResp.debateName + "</a></div>";
+								debateDetailsHtml += "<div class='debateListingShare'>Link to invite guests to watch the debate: https://debatable-app.appspot.com/guest.html?id=" + debateResp.id + "</div>";
+								debateDetailsHtml += "<br/><a href='room.html?id=" + debateResp.id + "'><div class='joinNowButton'>Join the Debate</div></a>";
+								debateDetailsHtml += "</div>";
+								$('#upcomingDebateDetails').append(debateDetailsHtml);
+							});
+					}
+				});
+			});
+		</script>
+  </head>
+  
+  <body id="debate">
+		<div class="headerContainer">
+			<a href="home.html"><img src="images/debatable_logo_white.png" height="45" border="0"/></a>
+			<div class="headerRightOptions">
+				Hello <span id="userName"></span>&nbsp;&nbsp;|&nbsp;&nbsp;<span id="logoutButton" class="textButton">Logout</span>
+			</div>
+		</div>
+
+	<div id="createDebate" class="newDebateButton">Create New Debate</div>
+
+
+	<div class="homeSection">
+		<div class="homeSectionTitle">My Debates</div>
+		<div id="upcomingDebateDetails">
+		</div>
+		<div class="homeSectionFooter"></div>
+	</div>
+
+  </body> 
+
+</html>

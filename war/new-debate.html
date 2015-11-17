@@ -1,0 +1,378 @@
+<html> 
+
+  <head>
+	<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+	<link rel="stylesheet" type="text/css" href="css/main.css" media="screen" />
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+	<script src='//static.opentok.com/v2/js/opentok.min.js'></script>
+	<script src="jquery-1.11.2.min.js"></script>
+	<script src="jquery.cookie.js"></script>
+	<script src="js/deUtil.js"></script>
+	<script src="js/deClassUser.js"></script>
+	<script src="js/deClassDebate.js"></script>
+	<script src="js/deClassDebateUsers.js"></script>
+	<script src="js/deClassContactList.js"></script>
+	<script src="debatableGlobal.js"></script>
+	<script src="https://cdn.rawgit.com/carlo/jquery-base64/master/jquery.base64.min.js"></script>
+	<script src="https://crypto-js.googlecode.com/svn/tags/3.0.2/build/rollups/hmac-sha1.js"></script>
+	<script>		
+		var session_id;
+		
+		function getToken(sessionId, userCode, role) {
+		  var secondsInDay = 2592000;
+
+		  // Credentials
+		  var apiKey = '45241592';
+		  var secret = 'b099560439c52ed195d79cb7c15fbae1d9b33f1e';
+	
+		  // Token Params
+		  var timeNow = Math.floor(Date.now()/1000);
+		  var expire = timeNow+secondsInDay;
+		  var data = userCode;
+
+		  TB.setLogLevel(TB.DEBUG);
+
+		  // Calculation
+		  data = escape(data);
+		  var rand = Math.floor(Math.random()*999999);
+		  var dataString =  "session_id="+sessionId+"&create_time="+timeNow+"&expire_time="+expire+"&role="+role+"&connection_data="+data+"&nonce="+rand;
+
+		  // Encryption
+		  var hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA1, secret);
+		  hmac.update( dataString );
+		  hash = hmac.finalize();
+
+		  preCoded = "partner_id="+apiKey+"&sig="+hash+":"+dataString;
+		  token = "T1=="+$.base64.encode( preCoded )
+		  return token;
+		}
+		
+		$( document ).ready(function() {			
+			$('#userName').text($.cookie("deFirstName"));
+
+			$('#logoutButton').click(function() {
+				$.removeCookie("deToken");
+				$.removeCookie("deUserID");
+				$.removeCookie("deFirstName");
+				$.removeCookie("deLastName");
+		    	window.location = "index.html";					
+			});
+
+			$('#saveButton').click(function() {
+				$('#saveButton').text("Saving...");
+				
+				// REST CALL TO GET SESSION AND TOKENS
+				$.ajax({ 
+				   type: "POST",
+				   url: "https://api.opentok.com/session/create/",
+				   headers: {"X-TB-PARTNER-AUTH":"45241592:b099560439c52ed195d79cb7c15fbae1d9b33f1e"},
+				   success: function(data){
+					   $(data).find('session_id').each(function() {
+						   session_id = $(this).text();
+						    console.log(session_id);
+						    var newDebate = {};
+						    newDebate.id = createUUID();
+						    newDebate.createdBy = $.cookie("deUserID");
+						    newDebate.sessionId = session_id;
+						    newDebate.debateName = $('#formDebateTitle').val();
+						    newDebate.debateFormat = $('#formDebateFormat').val();
+						    newDebate.prop1SpeakerFirstName = $('#formProp1FirstName').val();
+						    newDebate.prop1SpeakerLastName = $('#formProp1LastName').val();
+						    newDebate.prop1Email = $('#formProp1Email').val();
+						    newDebate.prop2SpeakerFirstName = $('#formProp2FirstName').val();
+						    newDebate.prop2SpeakerLastName = $('#formProp2LastName').val();
+						    newDebate.prop2Email = $('#formProp2Email').val();
+						    newDebate.opp1SpeakerFirstName = $('#formOpp1FirstName').val();
+						    newDebate.opp1SpeakerLastName = $('#formOpp1LastName').val();
+						    newDebate.opp1Email = $('#formOpp1Email').val();
+						    newDebate.opp2SpeakerFirstName = $('#formOpp2FirstName').val();
+						    newDebate.opp2SpeakerLastName = $('#formOpp2LastName').val();
+						    newDebate.opp2Email = $('#formOpp2Email').val();
+						    newDebate.judgeSpeakerFirstName = $('#formJudgeFirstName').val();
+						    newDebate.judgeSpeakerLastName = $('#formJudgeLastName').val();
+						    newDebate.judgeEmail = $('#formJudgeEmail').val();
+						    newDebate.timerFormat = $('#formDebateTimeCodes').val();
+							newDebate.guestCode = createUUID();
+							newDebate.guestToken = getToken(session_id,newDebate.guestCode, 'publisher');
+
+						    createDebate(newDebate, function(response) {
+
+						    	console.log("New Debate Response:");
+						    	console.log(response);
+
+						    	if (newDebate.id == response.id) {
+						    		var debateUserProp1 = {}
+						    		debateUserProp1.id = createUUID();
+						    		debateUserProp1.debateId = newDebate.id;
+						    		debateUserProp1.userEmail = response.prop1Email;
+						    		debateUserProp1.userId = response.prop1Id;
+						    		debateUserProp1.role = "prop1";
+						    		debateUserProp1.code = createUUID();
+						    		debateUserProp1.token = getToken(session_id,debateUserProp1.code, 'publisher');
+									if (response.createdBy == response.prop1Id) {
+										debateUserProp1.isOwner = "Yes";
+									} else {
+										debateUserProp1.isOwner = "No";										
+									}
+									
+						    		var debateUserProp2 = {}
+						    		debateUserProp2.id = createUUID();
+						    		debateUserProp2.debateId = newDebate.id;
+						    		debateUserProp2.userEmail = response.prop2Email;
+						    		debateUserProp2.userId = response.prop2Id;
+						    		debateUserProp2.role = "prop2";
+						    		debateUserProp2.code = createUUID();
+						    		debateUserProp2.token = getToken(session_id,debateUserProp2.code, 'publisher');
+									if (response.createdBy == response.prop2Id) {
+										debateUserProp2.isOwner = "Yes";
+									} else {
+										debateUserProp2.isOwner = "No";										
+									}
+
+					    			var debateUserOpp1 = {}
+						    		debateUserOpp1.id = createUUID();
+						    		debateUserOpp1.debateId = newDebate.id;
+						    		debateUserOpp1.userEmail = response.opp1Email;
+						    		debateUserOpp1.userId = response.opp1Id;
+						    		debateUserOpp1.role = "opp1";
+						    		debateUserOpp1.code = createUUID();
+						    		debateUserOpp1.token = getToken(session_id,debateUserOpp1.code, 'publisher');
+									if (response.createdBy == response.opp1Id) {
+										debateUserOpp1.isOwner = "Yes";
+									} else {
+										debateUserOpp1.isOwner = "No";										
+									}
+
+					    			var debateUserOpp2 = {}
+						    		debateUserOpp2.id = createUUID();
+						    		debateUserOpp2.debateId = newDebate.id;
+						    		debateUserOpp2.userEmail = response.opp2Email;
+						    		debateUserOpp2.userId = response.opp2Id;
+						    		debateUserOpp2.role = "opp2";
+						    		debateUserOpp2.code = createUUID();
+						    		debateUserOpp2.token = getToken(session_id,debateUserOpp2.code, 'publisher');
+									if (response.createdBy == response.opp2Id) {
+										debateUserOpp2.isOwner = "Yes";
+									} else {
+										debateUserOpp2.isOwner = "No";										
+									}
+
+					    			var debateUserJudge = {}
+						    		debateUserJudge.id = createUUID();
+						    		debateUserJudge.debateId = newDebate.id;
+						    		debateUserJudge.userEmail = response.judgeEmail;
+						    		debateUserJudge.userId = response.judgeId;
+						    		debateUserJudge.role = "judge";
+						    		debateUserJudge.code = createUUID();
+						    		debateUserJudge.token = getToken(session_id,debateUserJudge.code, 'moderator');
+									if (response.createdBy == response.judgeId) {
+										debateUserJudge.isOwner = "Yes";
+									} else {
+										debateUserJudge.isOwner = "No";										
+									}
+
+						    		createDebateUser(debateUserProp1, function(prop1Resp) {
+						    			newDebate.prop1Id = prop1Resp.userId;
+						    			newDebate.prop1Code = prop1Resp.code;
+						    			newDebate.prop1Token = prop1Resp.token;
+
+							    		createDebateUser(debateUserProp2, function(prop2Resp) {
+							    			newDebate.prop2Id = prop2Resp.userId;
+							    			newDebate.prop2Code = prop2Resp.code;
+							    			newDebate.prop2Token = prop2Resp.token;
+
+								    		createDebateUser(debateUserOpp1, function(opp1Resp) {
+								    			newDebate.opp1Id = opp1Resp.userId;
+								    			newDebate.opp1Code = opp1Resp.code;
+								    			newDebate.opp1Token = opp1Resp.token;
+
+									    		createDebateUser(debateUserOpp2, function(opp2Resp) {
+									    			newDebate.opp2Id = opp2Resp.userId;
+									    			newDebate.opp2Code = opp2Resp.code;
+									    			newDebate.opp2Token = opp2Resp.token;
+
+										    		createDebateUser(debateUserJudge, function(judgeResp) {
+										    			newDebate.judgeId = judgeResp.userId;
+										    			newDebate.judgeCode = judgeResp.code;
+										    			newDebate.judgeToken = judgeResp.token;
+
+										    			if (newDebate.createdBy != newDebate.prop1Id && newDebate.createdBy != newDebate.prop2Id && newDebate.createdBy != newDebate.opp1Id && newDebate.createdBy != newDebate.opp2Id && newDebate.createdBy != newDebate.judgeId) {
+											    			var debateUserOwner = {}
+											    			debateUserOwner.id = createUUID();
+											    			debateUserOwner.debateId = newDebate.id;
+											    			debateUserOwner.userEmail = $.cookie("deEmail");
+											    			debateUserOwner.userId = $.cookie("deUserID");
+											    			debateUserOwner.role = "guest";
+											    			debateUserOwner.code = null;
+											    			debateUserOwner.token = null;
+											    			debateUserOwner.isOwner = "Yes";
+												    		createDebateUser(debateUserOwner, function(ownerResp) {
+												    			updateDebate(newDebate, function(updateResp) {
+												    				console.log(updateResp);
+																	window.location = "home.html";						    										    																
+													    		});	
+											    			});	
+												    	} else {
+											    			updateDebate(newDebate, function(updateResp) {
+											    				console.log(updateResp);
+																window.location = "home.html";						    										    																
+											    			});	
+												    	}									    										    									    		
+										    		});						    			
+									    		});						    			
+								    		});						    			
+							    		});						    			
+						    		});						    			
+						    		
+						    	} else {
+						    		alert("We're sorry, there was an error creating your debate.  Please contact support@debatable.co for assistance.");
+						    	}
+						    });
+					   });
+					   
+				   }, 
+					   
+					error: function(model, error) {
+						        alert("We're sorry, there was an error trying to create this debate.  Please try again later.");      
+					   }
+						    
+				   });
+
+					   
+				});
+
+			$('#formDebateFormat').on('change', function() {
+				switch (this.value) {
+					case "1":
+						updateDebateDetails("Proposition", "Opposition", "Proposition #1", "Proposition #2", "Prop", "Opposition #1", "Opposition #2", "Opp", "Prop #1 7 min., Opp #1 8 min., Prop #2 8 min., Opp #2 8 min., Opp Rebuttal 4 min., Prop Rebuttal 5 min.", "p420,o480,p480,o480,o240,p300");
+						break;
+					case "2":
+						updateDebateDetails("Affirmative", "Aff", "Negative", "Neg", "Aff 6 min., Neg 3 min., Neg 7 min., Aff 3 min., Aff 6 min., Neg 6 min., Aff 3 min.", "p360, o180, o420, pro180, pro360, o360, p180");
+						break;
+					default:
+						updateDebateDetails("z");
+				}
+
+			});
+
+		});
+
+		function updateDebateDetails(propLabel, oppLabel, prop1Name, prop2Name, propAbb, opp1Name, opp2Name, oppAbb, timerLabel, timerFormat) {
+			formProName
+			$('#formProName').text(propLabel);
+			$('#formOppName').text(oppLabel);
+			$('#formProAbbreviation').text(propAbb);
+			$('#formOppAbbreviation').text(oppAbb);
+
+			$('#labelProp1Name').text(prop1Name);
+			$('#labelOpp1Name').text(opp1Name);
+			$('#labelProp1Email').text(prop1Name);
+			$('#labelOpp1Email').text(opp1Name);
+			$('#labelProp2Name').text(prop2Name);
+			$('#labelOpp2Name').text(opp2Name);
+			$('#labelProp2Email').text(prop2Name);
+			$('#labelOpp2Email').text(opp2Name);
+			$('#timerFormat').text(timerLabel);
+			$('#formDebateTimeCodes').val(timerFormat);
+			$('#debateDetails').show();
+		}
+	
+	</script>
+  </head>
+  
+  <body id="debate">
+		<div class="headerContainer">
+			<a href="index.html"><img src="images/debatable_logo_white.png" height="45" border="0"/></a>
+				
+			<div class="headerRightOptions">
+				Hello <span id="userName"></span>&nbsp;&nbsp;|&nbsp;&nbsp;<span id="logoutButton" class="textButton">Logout</span>
+			</div>
+		</div>
+
+
+	<div id="adminContainer">
+		<div class="createDebateContainer">
+			<div class="fullBarTitle">Create New Debate</div>
+
+			<table>
+				<tr>
+					<td class="formLabel">Debate Title:</td>
+					<td><input type="text" class="formField" id="formDebateTitle" /></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel">Debate Format:</td>
+					<td>
+						<select id="formDebateFormat" class="newDebateFormat">
+							<option value="0">Please select your debate format</option>
+							<option value="1">NPDA / CEDA / NDT / HS Policy / APDA</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+				
+				<div id="debateDetails" style="display:none">
+			
+			<input type="hidden" class="formField" id="formProName" />
+			<input type="hidden" class="formField" id="formOppName" />			
+			<input type="hidden" class="formField" id="formProAbbreviation" />
+			<input type="hidden" class="formField" id="formOppAbbreviation" />
+
+			<input type="hidden" class="formField" id="formProp1FirstName" />
+			<input type="hidden" class="formField" id="formProp1LastName" />
+			<input type="hidden" class="formField" id="formProp1Email" />
+			<input type="hidden" class="formField" id="formProp2FirstName" />
+			<input type="hidden" class="formField" id="formProp2LastName" />
+			<input type="hidden" class="formField" id="formProp2Email" />
+			<input type="hidden" class="formField" id="formOpp1FirstName" />
+			<input type="hidden" class="formField" id="formOpp1LastName" />
+			<input type="hidden" class="formField" id="formOpp1Email" />
+			<input type="hidden" class="formField" id="formOpp2FirstName" />
+			<input type="hidden" class="formField" id="formOpp2LastName" />
+			<input type="hidden" class="formField" id="formOpp2Email" />
+			<input type="hidden" class="formField" id="formJudgeFirstName" />
+			<input type="hidden" class="formField" id="formJudgeLastName" />
+			<input type="hidden" class="formField" id="formJudgeEmail" />
+			<input type="hidden" class="formField" id="formDebateTimeCodes" value="" />
+			
+			<table>
+				<tr>
+					<td class="formLabel"><div id="labelPropName">Proposition Speaker #1</div></td>
+					<td><div class="selectSpeakerButton" onclick="getSpeakerFromContacts('prop1')">Select</div><div id="prop1Speaker" class="speakerText"></div></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel"><div id="labelPropName">Proposition Speaker #2</div></td>
+					<td><div class="selectSpeakerButton" onclick="getSpeakerFromContacts('prop2')">Select</div><div id="prop2Speaker" class="speakerText"></div></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel"><div id="labelPropName">Opposition Speaker #1</div></td>
+					<td><div class="selectSpeakerButton" onclick="getSpeakerFromContacts('opp1')">Select</div><div id="opp1Speaker" class="speakerText"></div></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel"><div id="labelPropName">Opposition Speaker #2</div></td>
+					<td><div class="selectSpeakerButton" onclick="getSpeakerFromContacts('opp2')">Select</div><div id="opp2Speaker" class="speakerText"></div></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel">Judge Speaker Name:</td>
+					<td><div class="selectSpeakerButton" onclick="getSpeakerFromContacts('judge')">Select</div><div id="judgeSpeaker" class="speakerText"></div></td>
+				</tr>
+
+				<tr>
+					<td class="formLabel">Timer Format:</td>
+					<td><div id="timerFormat"></div></td>
+				</tr>
+
+			</table>
+
+			<div id="saveButton" class="loginButton">Save</div>
+		</div>
+
+	</div>
+
+  </body> 
+
+</html>
